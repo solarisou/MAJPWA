@@ -229,48 +229,54 @@
         let isScanning = false;
         let lastScannedCode = null;
         let scanCooldown = false;
-        
+        let detectionBuffer = [];
+        const REQUIRED_CONFIRMATIONS = 3; // Nombre de lectures identiques requises
+
         document.getElementById('start-scanner').addEventListener('click', function() {
             startBarcodeScanner();
         });
-        
+
         document.getElementById('stop-scanner').addEventListener('click', function() {
             stopBarcodeScanner();
         });
-        
+
         function startBarcodeScanner() {
             const scannerElement = document.getElementById('barcode-scanner');
             scannerElement.classList.remove('hidden');
-            
+            detectionBuffer = [];
+
             Quagga.init({
                 inputStream: {
                     name: "Live",
                     type: "LiveStream",
                     target: scannerElement,
                     constraints: {
-                        width: 640,
-                        height: 480,
-                        facingMode: "environment"
+                        width: { min: 640, ideal: 1280, max: 1920 },
+                        height: { min: 480, ideal: 720, max: 1080 },
+                        facingMode: "environment",
+                        aspectRatio: { min: 1, max: 2 }
                     },
+                    area: {
+                        top: "20%",
+                        right: "10%",
+                        left: "10%",
+                        bottom: "20%"
+                    }
                 },
                 decoder: {
                     readers: [
                         "ean_reader",
-                        "ean_8_reader",
-                        "upc_reader",
-                        "upc_e_reader",
-                        "code_128_reader",
-                        "code_39_reader"
+                        "ean_8_reader"
                     ],
                     multiple: false
                 },
                 locate: true,
                 locator: {
-                    halfSample: true,
-                    patchSize: "medium"
+                    halfSample: false,
+                    patchSize: "large"
                 },
-                numOfWorkers: 4,
-                frequency: 10,
+                numOfWorkers: navigator.hardwareConcurrency || 4,
+                frequency: 15,
             }, function(err) {
                 if (err) {
                     console.error('Erreur initialisation scanner:', err);
@@ -280,35 +286,63 @@
                 console.log("Scanner initialisé");
                 Quagga.start();
                 isScanning = true;
-                
+
                 document.getElementById('start-scanner').style.display = 'none';
                 document.getElementById('stop-scanner').style.display = 'inline-flex';
                 document.getElementById('scanner-status').classList.add('active');
                 document.getElementById('scanner-status').innerHTML = '<p class="has-text-grey">Recherche de code-barres...</p>';
             });
-            
+
             Quagga.onDetected(function(result) {
                 if (scanCooldown) return;
-                
+
                 const code = result.codeResult.code;
-                console.log("Code-barres détecté:", code);
-                
+                const errors = result.codeResult.decodedCodes
+                    .filter(d => d.error !== undefined)
+                    .map(d => d.error);
+                const avgError = errors.reduce((a, b) => a + b, 0) / errors.length;
+
+                // Ignorer les lectures avec trop d'erreurs
+                if (avgError > 0.1) {
+                    console.log("Lecture ignorée (erreur trop élevée):", avgError);
+                    return;
+                }
+
+                console.log("Code-barres détecté:", code, "Erreur moyenne:", avgError);
+
+                // Ajouter au buffer de confirmation
+                detectionBuffer.push(code);
+                if (detectionBuffer.length > 10) {
+                    detectionBuffer.shift();
+                }
+
+                // Compter les occurrences du code actuel
+                const occurrences = detectionBuffer.filter(c => c === code).length;
+
+                // Confirmer seulement si on a assez de lectures identiques
+                if (occurrences < REQUIRED_CONFIRMATIONS) {
+                    document.getElementById('scanner-status').innerHTML =
+                        `<p class="has-text-grey">Confirmation... (${occurrences}/${REQUIRED_CONFIRMATIONS})</p>`;
+                    return;
+                }
+
                 if (code === lastScannedCode) return;
-                
+
                 lastScannedCode = code;
                 scanCooldown = true;
-                
+                detectionBuffer = [];
+
                 if (navigator.vibrate) {
                     navigator.vibrate([200, 100, 200]);
                 }
-                
-                document.getElementById('scanner-status').innerHTML = 
+
+                document.getElementById('scanner-status').innerHTML =
                     `<p class="has-text-success has-text-weight-bold">Code détecté</p>
                      <p class="detected-barcode">${code}</p>`;
-                
+
                 document.getElementById('manual-barcode').value = code;
                 stopBarcodeScanner();
-                
+
                 setTimeout(() => {
                     searchProduct(code);
                     scanCooldown = false;
