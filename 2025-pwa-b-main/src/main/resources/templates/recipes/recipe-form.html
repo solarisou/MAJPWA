@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title th:text="${editing} ? 'Modifier une recette' : 'Créer une recette'">Recette - ECO Cook</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/recipes.css}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- FORM HERO -->
+    <section class="form-hero">
+        <div class="container">
+            <div class="form-hero-content">
+                <div class="form-hero-badge">
+                    <i class="fas fa-plus-circle"></i>
+                    <span th:text="${editing} ? 'Modification' : 'Nouvelle recette'">Nouvelle recette</span>
+                </div>
+                <h1 class="form-hero-title" th:text="${editing} ? 'Modifier la recette' : 'Créer une nouvelle recette'">
+                    Créer une recette
+                </h1>
+                <p class="form-hero-subtitle">
+                    Partagez vos recettes anti-gaspi et aidez la communauté à réduire le gaspillage alimentaire
+                </p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FORM SECTION -->
+    <section class="form-section">
+        <div class="container">
+            <form th:action="@{/recipes/save}" method="post" th:object="${recipe}" id="recipeForm" class="recipe-form-modern">
+                <input type="hidden" th:field="*{id}" />
+                
+                <!-- INFORMATIONS DE BASE -->
+                <div class="form-card">
+                    <h2 class="form-card-title">
+                        <i class="fas fa-info-circle"></i>
+                        Informations générales
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            Nom de la recette
+                            <span class="required">*</span>
+                        </label>
+                        <div class="form-input-icon">
+                            <i class="fas fa-utensils"></i>
+                            <input class="form-input" type="text" th:field="*{name}" 
+                                   placeholder="Ex: Tarte aux pommes maison" required maxlength="100">
+                        </div>
+                        <span class="form-hint">Maximum 100 caractères</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-textarea" th:field="*{description}" 
+                                  placeholder="Décrivez votre recette en quelques mots..." 
+                                  maxlength="500" rows="3"></textarea>
+                        <span class="form-hint">Maximum 500 caractères</span>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Catégorie
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="form-select-icon">
+                                    <i class="fas fa-list"></i>
+                                    <select class="form-select" th:field="*{category}" required>
+                                        <option value="">-- Choisir --</option>
+                                        <option value="entrée">Entrée</option>
+                                        <option value="plat">Plat</option>
+                                        <option value="dessert">Dessert</option>
+                                        <option value="apéritif">Apéritif</option>
+                                        <option value="boisson">Boisson</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Difficulté
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="form-select-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                    <select class="form-select" th:field="*{difficulty}" required>
+                                        <option value="">-- Choisir --</option>
+                                        <option value="facile">Facile</option>
+                                        <option value="moyen">Moyen</option>
+                                        <option value="difficile">Difficile</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Temps de préparation (min)
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="form-input-icon">
+                                    <i class="fas fa-clock"></i>
+                                    <input class="form-input" type="number" th:field="*{preparationTime}" 
+                                           required min="0" max="999" placeholder="15">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Temps de cuisson (min)
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="form-input-icon">
+                                    <i class="fas fa-fire"></i>
+                                    <input class="form-input" type="number" th:field="*{cookingTime}" 
+                                           required min="0" max="999" placeholder="30">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label class="form-label">
+                                    Nombre de personnes
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="form-input-icon">
+                                    <i class="fas fa-users"></i>
+                                    <input class="form-input" type="number" th:field="*{servings}" 
+                                           required min="1" max="50" placeholder="4">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- INGRÉDIENTS -->
+                <div class="form-card">
+                    <h2 class="form-card-title">
+                        <i class="fas fa-shopping-basket"></i>
+                        Ingrédients
+                    </h2>
+                    
+                    <div id="ingredientsList" class="ingredients-form-list">
+                        <!-- Ingrédients existants -->
+                        <div th:each="ingredient, iterStat : ${recipe.ingredients}" class="ingredient-form-item">
+                            <div class="ingredient-form-row">
+                                <div class="ingredient-icon-cell">
+                                    <img class="ingredient-icon-preview"
+                                         th:attr="data-default=@{/images/logoPannier.svg}"
+                                         th:src="@{/images/logoPannier.svg}"
+                                         alt="Icône ingrédient">
+                                </div>
+                                <div class="ingredient-input-main">
+                                    <label class="form-label-small">Nom</label>
+                                    <input class="form-input ingredient-name-input" type="text" 
+                                           name="ingredientNames"
+                                           th:value="${ingredient.name}"
+                                           placeholder="Nom de l'ingrédient"
+                                           autocomplete="off">
+                                    <div class="ingredient-suggestions"></div>
+                                </div>
+                                <div class="ingredient-input-small">
+                                    <label class="form-label-small">Quantité</label>
+                                    <input class="form-input" type="number" 
+                                           name="ingredientQuantities"
+                                           th:value="${ingredient.quantity}"
+                                           placeholder="Qté" min="0" step="0.01">
+                                </div>
+                                <div class="ingredient-input-small">
+                                    <label class="form-label-small">Unité</label>
+                                    <input class="form-input ingredient-unit-input" type="text" 
+                                           name="ingredientUnits"
+                                           th:value="${ingredient.unit}"
+                                           placeholder="g, kg...">
+                                </div>
+                                <button type="button" class="btn-remove-ingredient remove-ingredient">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" class="btn-add-ingredient" id="addIngredientBtn">
+                        <i class="fas fa-plus"></i>
+                        <span>Ajouter un ingrédient</span>
+                    </button>
+                </div>
+                
+                <!-- INSTRUCTIONS -->
+                <div class="form-card">
+                    <h2 class="form-card-title">
+                        <i class="fas fa-list-ol"></i>
+                        Instructions de préparation
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            Étapes de préparation
+                            <span class="required">*</span>
+                        </label>
+                        <textarea class="form-textarea large" th:field="*{instructions}" 
+                                  required rows="12"
+                                  placeholder="Décrivez les étapes de préparation...&#10;&#10;1. Préchauffer le four à 180°C&#10;2. Mélanger les ingrédients secs dans un grand bol&#10;3. Ajouter les ingrédients liquides progressivement..."></textarea>
+                        <span class="form-hint">Décrivez chaque étape clairement</span>
+                    </div>
+                </div>
+                
+                <!-- ACTIONS -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-form-submit">
+                        <i class="fas fa-check"></i>
+                        <span th:text="${editing} ? 'Enregistrer les modifications' : 'Créer la recette'">
+                            Créer la recette
+                        </span>
+                    </button>
+                    <a th:href="@{/recipes}" class="btn-form-cancel">
+                        <i class="fas fa-times"></i>
+                        <span>Annuler</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </section>
+    
+     <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>
+    <!-- JavaScript externe -->
+    <script th:src="@{/js/recipe-form.js}"></script>
+</body>
+</html>

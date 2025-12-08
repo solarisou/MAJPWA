@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title th:text="${recipe.name} + ' - ECO Cook'">Recette - ECO Cook</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/recipes.css}">
+    <link rel="stylesheet" th:href="@{/css/reviews.css}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>
+    
+    <!-- BREADCRUMB -->
+    <!--
+    <section class="breadcrumb-section">
+        <div class="container">
+            <nav class="breadcrumb-modern">
+                <a th:href="@{/}">
+                    <i class="fas fa-home"></i>
+                    Accueil
+                </a>
+                <i class="fas fa-chevron-right"></i>
+                <a th:href="@{/recipes}">Recettes</a>
+                <i class="fas fa-chevron-right"></i>
+                <span th:text="${recipe.name}">Recette actuelle</span>
+            </nav>
+        </div>
+    </section>
+    -->
+    <!-- RECIPE HEADER -->
+    <section class="recipe-detail-header">
+        <div class="container">
+            <div class="detail-header-content">
+                <div class="detail-title-section">
+                    <h1 class="detail-title" th:text="${recipe.name}">Nom de la recette</h1>
+                    <p class="detail-description" th:text="${recipe.description}">Description de la recette</p>
+                    <div class="recipe-author" th:if="${recipe.createdBy != null}">
+                        <i class="fas fa-user-circle"></i>
+                        <span>Recette proposée par <strong th:text="${recipe.createdBy}">Auteur</strong></span>
+                    </div>
+                </div>
+                
+                <div class="detail-actions" sec:authorize="isAuthenticated()">
+                    <form th:action="@{/recipes/{id}/toggle-selection(id=${recipe.id})}" method="post">
+                        <button type="submit" 
+                                th:class="${isSelected} ? 'btn-detail-action selected' : 'btn-detail-action'">
+                            <i th:class="${isSelected} ? 'fas fa-check-circle' : 'far fa-circle'"></i>
+                            <span th:text="${isSelected} ? 'Sélectionnée' : 'Sélectionner'">Sélectionner</span>
+                        </button>
+                    </form>
+                    <a th:href="@{/recipes/edit/{id}(id=${recipe.id})}" 
+                       class="btn-detail-action edit"
+                       th:if="${canEdit}">
+                        <i class="fas fa-edit"></i>
+                        <span>Modifier</span>
+                    </a>
+                    <form th:action="@{/recipes/delete/{id}(id=${recipe.id})}" 
+                          method="post" 
+                          style="display: inline;"
+                          th:if="${canEdit}">
+                        <button type="submit" class="btn-detail-action delete"
+                                onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette recette ?');">
+                            <i class="fas fa-trash"></i>
+                            <span>Supprimer</span>
+                        </button>
+                    </form>
+                    <form th:action="@{/recipes/{id}/report(id=${recipe.id})}" 
+                          method="post" 
+                          style="display: inline;"
+                          sec:authorize="isAuthenticated()"
+                          th:if="${!canEdit && !hasUserReported}">
+                        <button type="button" 
+                                class="btn-detail-action report"
+                                onclick="showReportModal()">
+                            <i class="fas fa-flag"></i>
+                            <span>Signaler</span>
+                        </button>
+                    </form>
+                    <div th:if="${hasUserReported}" class="notification is-info is-light" style="margin-top: 1rem;">
+                        <i class="fas fa-info-circle"></i>
+                        Vous avez déjà signalé cette recette. Un administrateur va l'examiner.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-meta-bar">
+                <div class="meta-badge">
+                    <i class="fas fa-clock"></i>
+                    <span>Préparation: <strong th:text="${recipe.preparationTime} + ' min'">10 min</strong></span>
+                </div>
+                <div class="meta-badge cooking">
+                    <i class="fas fa-fire"></i>
+                    <span>Cuisson: <strong th:text="${recipe.cookingTime} + ' min'">20 min</strong></span>
+                </div>
+                <div class="meta-badge">
+                    <i class="fas fa-users"></i>
+                    <span><strong th:text="${recipe.servings}">4</strong> personnes</span>
+                </div>
+                <div class="meta-badge">
+                    <i class="fas fa-chart-line"></i>
+                    <span th:text="${recipe.difficulty}">Facile</span>
+                </div>
+                <div class="meta-badge">
+                    <i class="fas fa-utensils"></i>
+                    <span th:text="${recipe.category}">Plat</span>
+                </div>
+            </div>
+            
+            <div th:if="${match != null}" class="availability-alert">
+                <div th:if="${match.fullyAvailable}" class="alert-box success">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>100% disponible</strong>
+                        <p>Tous les ingrédients sont en stock !</p>
+                    </div>
+                </div>
+                <div th:if="${match.partiallyAvailable}" class="alert-box warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong><span th:text="${#numbers.formatDecimal(match.matchPercentage, 0, 0)}">75</span>% disponible</strong>
+                        <p>Il vous manque quelques ingrédients</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- RECIPE CONTENT -->
+    <section class="recipe-detail-content">
+        <div class="container">
+            <div class="detail-grid">
+                <!-- INGREDIENTS SIDEBAR -->
+                <aside class="ingredients-sidebar">
+                    <div class="sidebar-card">
+                        <h2 class="sidebar-title">
+                            <i class="fas fa-shopping-basket"></i>
+                            Ingrédients
+                        </h2>
+                        
+                        <div th:if="${match != null}" class="ingredients-status">
+                            <div th:if="${match.fullyAvailable}" class="status-message success">
+                                <i class="fas fa-check-circle"></i>
+                                Vous avez tous les ingrédients !
+                            </div>
+                            <div th:unless="${match.fullyAvailable}" class="status-message warning">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Il vous manque quelques ingrédients
+                            </div>
+                        </div>
+                        
+                        <ul class="ingredients-list">
+                            <li th:each="ingredient : ${recipe.ingredients}" class="ingredient-item">
+                                <span th:if="${match != null and match.matchedIngredients.contains(ingredient)}" 
+                                      class="ingredient-status available">
+                                    <i class="fas fa-check-circle"></i>
+                                </span>
+                                <span th:if="${match != null and match.missingIngredients.contains(ingredient)}" 
+                                      class="ingredient-status missing">
+                                    <i class="fas fa-times-circle"></i>
+                                </span>
+                                <span class="ingredient-text">
+                                    <strong th:text="${ingredient.quantity}">3</strong>
+                                    <span th:text="${ingredient.unit}">pièce</span>
+                                    de <span th:text="${ingredient.name}">Tomates</span>
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </aside>
+                
+                <!-- INSTRUCTIONS MAIN -->
+                <main class="instructions-main">
+                    <div class="instructions-card">
+                        <h2 class="instructions-title">
+                            <i class="fas fa-list-ol"></i>
+                            Préparation
+                        </h2>
+                        <div class="instructions-content" th:text="${recipe.instructions}">
+                            Instructions de préparation...
+                        </div>
+                    </div>
+                    
+                    <div class="detail-bottom-actions">
+                        <a th:href="@{/recipes}" class="btn-back">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Retour aux recettes</span>
+                        </a>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+    
+    <!-- REVIEWS SECTION -->
+    <section class="section" style="background: var(--bg-light);">
+        <div class="container">
+            <div class="box">
+                <h2 class="title is-4">
+                    <i class="fas fa-star"></i>
+                    Avis et commentaires
+                    <span th:if="${reviewCount > 0}" class="tag is-primary" style="margin-left: 1rem;">
+                        <span th:text="${reviewCount}">0</span> avis
+                    </span>
+                </h2>
+                
+                <!-- Average Rating -->
+                <div th:if="${averageRating > 0}" class="content" style="margin-top: 1rem;">
+                    <p class="subtitle is-5">
+                        Note moyenne : 
+                        <span th:text="${#numbers.formatDecimal(averageRating, 1, 1)}">0.0</span>
+                        <span class="icon has-text-warning">
+                            <i class="fas fa-star"></i>
+                        </span>
+                        <span class="is-size-6 has-text-grey">
+                            (<span th:text="${reviewCount}">0</span> avis)
+                        </span>
+                    </p>
+                </div>
+                
+                <!-- Add Review Form -->
+                <div sec:authorize="isAuthenticated()" th:if="${!hasUserReviewed}" class="box" style="margin-top: 2rem; background: var(--bg-white);">
+                    <h3 class="title is-5">Laisser un avis</h3>
+                    <form th:action="@{/recipes/{id}/review(id=${recipe.id})}" 
+                          method="post" 
+                          enctype="multipart/form-data">
+                        
+                        <div class="field">
+                            <label class="label">Note</label>
+                            <div class="star-rating">
+                                <input type="radio" name="rating" value="5" id="star5" required>
+                                <label for="star5" title="Excellent"><i class="fas fa-star"></i></label>
+                                
+                                <input type="radio" name="rating" value="4" id="star4">
+                                <label for="star4" title="Très bien"><i class="fas fa-star"></i></label>
+                                
+                                <input type="radio" name="rating" value="3" id="star3">
+                                <label for="star3" title="Bien"><i class="fas fa-star"></i></label>
+                                
+                                <input type="radio" name="rating" value="2" id="star2">
+                                <label for="star2" title="Moyen"><i class="fas fa-star"></i></label>
+                                
+                                <input type="radio" name="rating" value="1" id="star1">
+                                <label for="star1" title="Décevant"><i class="fas fa-star"></i></label>
+                            </div>
+                        </div>
+                        
+                        <div class="field">
+                            <label class="label">Commentaire</label>
+                            <div class="control">
+                                <textarea class="textarea" 
+                                          name="comment" 
+                                          placeholder="Partagez votre expérience avec cette recette..."
+                                          rows="4"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="field">
+                            <label class="label">Photos (optionnel)</label>
+                            <div class="control">
+                                <input class="input" 
+                                       type="file" 
+                                       name="photos" 
+                                       accept="image/*" 
+                                       multiple>
+                                <p class="help">Vous pouvez ajouter jusqu'à 5 photos</p>
+                            </div>
+                        </div>
+                        
+                        <div class="field">
+                            <div class="control">
+                                <button type="submit" class="button is-success">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>Publier l'avis</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Reviews List -->
+                <div th:if="${!#lists.isEmpty(reviews)}" style="margin-top: 2rem;">
+                    <h3 class="title is-5">Avis des utilisateurs</h3>
+                    <div th:each="review : ${reviews}"
+                         class="box"
+                         style="margin-top: 1rem;"
+                         th:attr="id=${'review-' + review.id}">
+                        <div class="level">
+                            <div class="level-left">
+                                <div>
+                                    <p class="title is-6">
+                                        <span th:text="${review.userName}">Utilisateur</span>
+                                    </p>
+                                    <p class="subtitle is-7 has-text-grey">
+                                        <span th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy HH:mm')}">Date</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="level-right">
+                                <div class="tags has-addons">
+                                    <span class="tag is-warning" th:text="${review.rating} + ' étoiles'">Note</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div th:if="${review.reported}" class="notification is-warning is-light" style="margin-top: 0.5rem;">
+                            <i class="fas fa-flag"></i>
+                            Cet avis a été signalé et est en cours de vérification.
+                        </div>
+
+                        <div th:if="${review.comment}" class="content" style="margin-top: 1rem;">
+                            <p th:text="${review.comment}">Commentaire</p>
+                        </div>
+                        
+                        <div th:if="${!#lists.isEmpty(review.photos)}" class="columns" style="margin-top: 1rem;">
+                            <div th:each="photo : ${review.photos}" class="column is-3">
+                                <figure class="image">
+                                    <img th:src="@{${photo.photoPath}}" alt="Photo de l'avis" style="border-radius: 8px;">
+                                </figure>
+                            </div>
+                        </div>
+                        
+                        <div sec:authorize="isAuthenticated()" class="buttons" style="margin-top: 1rem;">
+                            <button type="button"
+                                    class="button is-info is-small is-light"
+                                    th:if="${currentUser != null and review.userName == currentUser}"
+                                    th:attr="data-review-id=${review.id}"
+                                    onclick="toggleEditForm(this.getAttribute('data-review-id'))">
+                                <i class="fas fa-edit"></i>
+                                <span>Modifier</span>
+                            </button>
+                            <form th:action="@{/recipes/reviews/{id}/delete(id=${review.id})}"
+                                  method="post"
+                                  style="display: inline;"
+                                  th:if="${currentUser != null and (review.userName == currentUser || isAdminUser)}"
+                                  onsubmit="return confirm('Supprimer cet avis ?');">
+                                <button type="submit" class="button is-danger is-small is-light">
+                                    <i class="fas fa-trash"></i>
+                                    <span>Supprimer</span>
+                                </button>
+                            </form>
+                            <form th:action="@{/recipes/reviews/{id}/report(id=${review.id})}"
+                                  method="post"
+                                  style="display: inline;"
+                                  th:if="${currentUser != null && review.userName != currentUser}">
+                                <button type="submit" class="button is-danger is-small is-light">
+                                    <i class="fas fa-flag"></i>
+                                    <span>Signaler</span>
+                                </button>
+                            </form>
+                            <button type="button"
+                                    class="button is-primary is-small is-light"
+                                    th:if="${currentUser != null and canReplyToReviews and userHasRootReply[review.id] != true}"
+                                    th:attr="data-review-id=${review.id}"
+                                    onclick="toggleReplyForm(this.getAttribute('data-review-id'))">
+                                <i class="fas fa-reply"></i>
+                                <span>Répondre</span>
+                            </button>
+                        </div>
+                        <div class="reply-limit-info"
+                             sec:authorize="isAuthenticated()"
+                             th:if="${currentUser != null and canReplyToReviews and userHasRootReply[review.id] == true}">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Vous avez déjà répondu à cet avis.</span>
+                        </div>
+                        <div class="reply-limit-info"
+                             sec:authorize="isAuthenticated()"
+                             th:if="${currentUser != null and !canReplyToReviews}">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Seuls l'auteur de la recette ou un administrateur peuvent répondre.</span>
+                        </div>
+
+                        <div th:if="${currentUser != null and review.userName == currentUser}"
+                             th:id="${'edit-review-' + review.id}"
+                             class="box is-light is-hidden"
+                             style="margin-top: 1rem;">
+                            <h4 class="title is-6">Modifier votre avis</h4>
+                            <form th:action="@{/recipes/reviews/{id}/edit(id=${review.id})}"
+                                  method="post">
+                                <div class="field">
+                                    <label class="label">Note</label>
+                                    <div class="control">
+                                        <div class="select is-small">
+                                            <select name="rating" required>
+                                                <option value="5" th:selected="${review.rating == 5}">5 étoiles - Excellent</option>
+                                                <option value="4" th:selected="${review.rating == 4}">4 étoiles - Très bien</option>
+                                                <option value="3" th:selected="${review.rating == 3}">3 étoiles - Bien</option>
+                                                <option value="2" th:selected="${review.rating == 2}">2 étoiles - Moyen</option>
+                                                <option value="1" th:selected="${review.rating == 1}">1 étoile - Décevant</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label">Commentaire</label>
+                                    <div class="control">
+                                        <textarea class="textarea" name="comment" rows="3" th:text="${review.comment}"></textarea>
+                                    </div>
+                                </div>
+                                <div class="field is-grouped">
+                                    <div class="control">
+                                        <button type="submit" class="button is-success is-small">
+                                            <i class="fas fa-save"></i>
+                                            <span>Enregistrer</span>
+                                        </button>
+                                    </div>
+                                    <div class="control">
+                                        <button type="button" class="button is-light is-small"
+                                                th:attr="data-review-id=${review.id}"
+                                                onclick="toggleEditForm(this.getAttribute('data-review-id'))">
+                                            Annuler
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div sec:authorize="isAuthenticated()"
+                             th:id="${'reply-review-' + review.id}"
+                             class="box is-light is-hidden"
+                             style="margin-top: 1rem;"
+                             th:if="${currentUser != null and canReplyToReviews and userHasRootReply[review.id] != true}">
+                            <h4 class="title is-6">Répondre à cet avis</h4>
+                            <div class="reply-context">
+                                <div class="reference-label">
+                                    <i class="fas fa-reply"></i>
+                                    <span th:text="${'Répondre à ' + review.userName}">Répondre à Auteur</span>
+                                </div>
+                                <p class="reference-preview"
+                                   th:text="${#strings.isEmpty(review.comment) ? 'Pas de contenu texte' : #strings.abbreviate(review.comment, 160)}">
+                                    Texte de l'avis sélectionné
+                                </p>
+                            </div>
+                            <form th:action="@{/recipes/reviews/{id}/reply(id=${review.id})}"
+                                  method="post">
+                                <div class="field">
+                                    <div class="control">
+                                        <textarea class="textarea" name="comment" rows="3" placeholder="Votre réponse..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="field is-grouped">
+                                    <div class="control">
+                                        <button type="submit" class="button is-primary is-small">
+                                            <i class="fas fa-paper-plane"></i>
+                                            <span>Publier la réponse</span>
+                                        </button>
+                                    </div>
+                                    <div class="control">
+                                        <button type="button" class="button is-light is-small"
+                                                th:attr="data-review-id=${review.id}"
+                                                onclick="toggleReplyForm(this.getAttribute('data-review-id'))">
+                                            Annuler
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div th:if="${!#lists.isEmpty(review.replies)}" class="review-replies" style="margin-top: 1.5rem;">
+                            <div th:each="reply : ${review.replies.?[parent == null]}">
+                                <div th:replace="~{fragments/review-reply :: replyThread(reply=${reply}, currentUser=${currentUser}, isAdminUser=${isAdminUser}, reviewOwner=${review.userName}, canReplyToReviews=${canReplyToReviews}, reviewId=${review.id}, reviewUserName=${review.userName}, reviewComment=${review.comment})}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div th:if="${#lists.isEmpty(reviews)}" class="has-text-centered" style="margin-top: 2rem; padding: 2rem;">
+                    <p class="subtitle is-6 has-text-grey">Aucun avis pour le moment. Soyez le premier à en laisser un !</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Modal pour signaler une recette -->
+    <div class="modal" id="reportModal">
+        <div class="modal-background" onclick="closeReportModal()"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">
+                    <i class="fas fa-flag"></i>
+                    Signaler une recette
+                </p>
+                <button class="delete" aria-label="close" onclick="closeReportModal()"></button>
+            </header>
+            <section class="modal-card-body">
+                <form th:action="@{/recipes/{id}/report(id=${recipe.id})}" method="post">
+                    <div class="field">
+                        <label class="label">Raison du signalement</label>
+                        <div class="control">
+                            <textarea class="textarea" 
+                                      name="reason" 
+                                      placeholder="Expliquez pourquoi vous signalez cette recette (contenu inapproprié, erreurs, etc.)"
+                                      rows="4"></textarea>
+                        </div>
+                        <p class="help">Votre signalement sera examiné par un administrateur.</p>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button type="submit" class="button is-danger">
+                                <i class="fas fa-flag"></i>
+                                <span>Signaler</span>
+                            </button>
+                            <button type="button" class="button" onclick="closeReportModal()">
+                                Annuler
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script>
+        function showReportModal() {
+            document.getElementById('reportModal').classList.add('is-active');
+        }
+    
+        function closeReportModal() {
+            document.getElementById('reportModal').classList.remove('is-active');
+        }
+
+        function toggleEditForm(reviewId) {
+            const target = document.getElementById(`edit-review-${reviewId}`);
+            if (target) {
+                target.classList.toggle('is-hidden');
+            }
+        }
+
+        function toggleReplyForm(reviewId) {
+            const target = document.getElementById(`reply-review-${reviewId}`);
+            if (target) {
+                target.classList.toggle('is-hidden');
+            }
+        }
+
+        function toggleReplyEditForm(replyId) {
+            const target = document.getElementById(`edit-reply-${replyId}`);
+            if (target) {
+                target.classList.toggle('is-hidden');
+            }
+        }
+
+        function toggleNestedReplyForm(replyId) {
+            const target = document.getElementById(`nested-reply-${replyId}`);
+            if (target) {
+                target.classList.toggle('is-hidden');
+            }
+        }
+    </script>
+</body>
+</html>

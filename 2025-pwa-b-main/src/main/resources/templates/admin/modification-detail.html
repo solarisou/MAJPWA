@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Détails de la modification - ECO Cook</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/recipes.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/compte-admin.css}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- MODIFICATION DETAIL -->
+    <section class="section">
+        <div class="container">
+            <div class="level">
+                <div class="level-left">
+                    <h1 class="title is-2">Détails de la modification</h1>
+                </div>
+                <div class="level-right">
+                    <a th:href="@{/admin/modifications}" class="button">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Retour</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            <div th:if="${success}" class="notification is-success is-light">
+                <button class="delete" onclick="this.parentElement.remove()"></button>
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="notification is-danger is-light">
+                <button class="delete" onclick="this.parentElement.remove()"></button>
+                <span th:text="${error}"></span>
+            </div>
+            
+            <!-- Comparison -->
+            <div class="columns" style="margin-top: 2rem;">
+                <!-- Original Recipe -->
+                <div class="column">
+                    <div class="box">
+                        <h2 class="title is-4">Recette originale</h2>
+                        <p><strong>Nom:</strong> <span th:text="${originalRecipe.name}"></span></p>
+                        <p><strong>Description:</strong> <span th:text="${originalRecipe.description}"></span></p>
+                        <p><strong>Catégorie:</strong> <span th:text="${originalRecipe.category}"></span></p>
+                        <p><strong>Difficulté:</strong> <span th:text="${originalRecipe.difficulty}"></span></p>
+                        <p><strong>Temps:</strong> <span th:text="${originalRecipe.totalTime} + ' min'"></span></p>
+                        <p><strong>Portions:</strong> <span th:text="${originalRecipe.servings}"></span></p>
+                        
+                        <h3 class="title is-5" style="margin-top: 1rem;">Ingrédients:</h3>
+                        <ul>
+                            <li th:each="ingredient : ${originalRecipe.ingredients}">
+                                <span th:text="${ingredient.name} + ' - ' + ${ingredient.quantity} + ' ' + ${ingredient.unit}"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Modified Recipe -->
+                <div class="column">
+                    <div class="box" style="border: 2px solid var(--eco-orange);">
+                        <h2 class="title is-4">Modification proposée</h2>
+                        <p><strong>Nom:</strong> <span th:text="${modification.name}"></span></p>
+                        <p><strong>Description:</strong> <span th:text="${modification.description}"></span></p>
+                        <p><strong>Catégorie:</strong> <span th:text="${modification.category}"></span></p>
+                        <p><strong>Difficulté:</strong> <span th:text="${modification.difficulty}"></span></p>
+                        <p><strong>Temps:</strong> <span th:text="${modification.totalTime} + ' min'"></span></p>
+                        <p><strong>Portions:</strong> <span th:text="${modification.servings}"></span></p>
+                        
+                        <h3 class="title is-5" style="margin-top: 1rem;">Ingrédients:</h3>
+                        <ul>
+                            <li th:each="ingredient : ${modification.ingredients}">
+                                <span th:text="${ingredient.name} + ' - ' + ${ingredient.quantity} + ' ' + ${ingredient.unit}"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="box" style="margin-top: 2rem;">
+                <div class="level">
+                    <div class="level-left">
+                        <p><strong>Modifié par:</strong> <span th:text="${modification.modifiedBy}"></span></p>
+                        <p><strong>Date:</strong> <span th:text="${#temporals.format(modification.createdAt, 'dd/MM/yyyy à HH:mm')}"></span></p>
+                    </div>
+                    <div class="level-right">
+                        <div class="buttons">
+                            <form th:action="@{/admin/modifications/{id}/approve(id=${modification.id})}" 
+                                  method="post" 
+                                  style="display: inline;">
+                                <button type="submit" class="button is-success is-large">
+                                    <i class="fas fa-check"></i>
+                                    <span>Approuver</span>
+                                </button>
+                            </form>
+                            <form th:action="@{/admin/modifications/{id}/reject(id=${modification.id})}" 
+                                  method="post" 
+                                  style="display: inline;"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir rejeter cette modification ?');">
+                                <input type="text" name="reason" placeholder="Raison du rejet (optionnel)" class="input" style="margin-right: 0.5rem;">
+                                <button type="submit" class="button is-danger is-large">
+                                    <i class="fas fa-times"></i>
+                                    <span>Rejeter</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>
+</body>
+</html>
+

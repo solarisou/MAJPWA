@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Gestion des utilisateurs - ECO Cook</title>
+
+    <link rel="stylesheet" th:href="@{/css/recipes.css}">
+ 
+    <link rel="stylesheet" th:href="@{/css/admin-users.css}">
+    <link rel="stylesheet" th:href="@{/css/compte-admin.css}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- USERS LIST -->
+    <section class="section">
+        <div class="container">
+            <div class="level">
+                <div class="level-left">
+                    <h1 class="title is-2">Gestion des utilisateurs</h1>
+                </div>
+                <div class="level-right">
+                    <a th:href="@{/admin/users/create-admin}" class="button is-success" style="margin-right: 1rem;">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Créer un compte admin</span>
+                    </a>
+                    <a th:href="@{/admin}" class="button">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Retour</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            <div th:if="${success}" class="notification is-success is-light">
+                <button class="delete" onclick="this.parentElement.remove()"></button>
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="notification is-danger is-light">
+                <button class="delete" onclick="this.parentElement.remove()"></button>
+                <span th:text="${error}"></span>
+            </div>
+            
+            <!-- Users Table -->
+            <div class="box" style="margin-top: 2rem;">
+                <table class="table is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>Nom d'utilisateur</th>
+                            <th>Nom d'affichage</th>
+                            <th>Rôles</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.userName}">username</td>
+                            <td th:text="${user.displayName}">Display Name</td>
+                            <td>
+                                <!-- Afficher seulement ADMIN si présent, sinon afficher les autres rôles -->
+                                <th:block th:with="hasAdmin=${user.roles.?[name() == 'ADMIN'].size() > 0}">
+                                    <span th:if="${hasAdmin}" class="tag is-danger">
+                                        Admin
+                                    </span>
+                                    <span th:unless="${hasAdmin}"
+                                          th:each="role : ${user.roles}" 
+                                          class="tag"
+                                          th:classappend="${role.name() == 'MODERATEUR'} ? 'is-warning' : 'is-success'"
+                                          style="margin-right: 0.5rem;">
+                                        <span th:text="${role.name()}">ROLE</span>
+                                    </span>
+                                </th:block>
+                            </td>
+                            <td>
+                                <form th:action="@{/admin/users/delete/{username}(username=${user.userName})}" 
+                                      method="post" 
+                                      style="display: inline;"
+                                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
+                                    <button type="submit" class="button is-danger is-small">
+                                        <i class="fas fa-trash"></i>
+                                        <span>Supprimer</span>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>
+</body>
+</html>
+

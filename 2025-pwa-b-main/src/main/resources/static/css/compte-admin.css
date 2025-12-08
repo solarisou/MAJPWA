@@ -1,0 +1,1011 @@
+/* Styles admin principaux */
+
+section.section:has(.level-right a[href^="/admin"]) {
+    min-height: calc(100vh - 200px);
+    padding: 3.25rem 1.75rem;
+    background: linear-gradient(
+        138deg,
+        color-mix(in srgb, var(--eco-green) 12%, transparent) 0%,
+        color-mix(in srgb, var(--eco-orange) 9%, transparent) 55%,
+        color-mix(in srgb, var(--bg-light) 92%, var(--bg-white)) 100%
+    );
+    position: relative;
+}
+
+section.section:has(.level-right a[href^="/admin"])::before,
+section.section:has(.level-right a[href^="/admin"])::after {
+    content: '';
+    position: absolute;
+    width: clamp(180px, 28vw, 320px);
+    height: clamp(180px, 28vw, 320px);
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0.35;
+    z-index: 0;
+}
+
+section.section:has(.level-right a[href^="/admin"])::before {
+    top: -110px;
+    right: -70px;
+    background: radial-gradient(
+        circle,
+        color-mix(in srgb, var(--eco-orange) 22%, transparent) 0%,
+        transparent 70%
+    );
+}
+
+section.section:has(.level-right a[href^="/admin"])::after {
+    bottom: -130px;
+    left: -40px;
+    background: radial-gradient(
+        circle,
+        color-mix(in srgb, var(--eco-green) 20%, transparent) 0%,
+        transparent 70%
+    );
+}
+
+section.section:has(.level-right a[href^="/admin"]) .container,
+section.section:has(.level-right a[href^="/admin"]) .container * {
+    position: relative;
+    z-index: 1;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .title.is-2 {
+    position: relative;
+    display: inline-block;
+    font-weight: 800;
+    color: var(--dark-text);
+    letter-spacing: -0.02em;
+    padding-bottom: 0.6rem;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .title.is-2::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--eco-green), var(--eco-orange));
+}
+
+section.section:has(.level-right a[href^="/admin"]) .level {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .level-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .level-right .button + .button {
+    margin-left: 0;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .notification {
+    border-radius: 16px;
+    padding: 1.35rem 1.65rem;
+    border: none;
+    box-shadow: var(--shadow-lg);
+    font-weight: 600;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .notification .delete {
+    background: rgba(0, 0, 0, 0.08);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .notification .delete:hover {
+    background: rgba(0, 0, 0, 0.2);
+    transform: rotate(90deg);
+}
+
+.notification.is-success.is-light {
+    background: color-mix(in srgb, var(--success-light) 85%, transparent);
+    color: var(--success-dark);
+    border-left: 4px solid var(--eco-green);
+}
+
+.notification.is-danger.is-light {
+    background: color-mix(in srgb, var(--danger-light) 88%, transparent);
+    color: var(--danger-dark);
+    border-left: 4px solid var(--danger-dark);
+}
+
+.notification.is-warning.is-light {
+    background: color-mix(in srgb, var(--warning-light) 80%, transparent);
+    color: var(--warning-dark);
+    border-left: 4px solid var(--warning-dark);
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box {
+    border-radius: 22px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 45%, transparent);
+    background: color-mix(in srgb, var(--bg-white) 96%, transparent);
+    box-shadow: var(--shadow-md);
+    padding: clamp(1.75rem, 2.5vw, 2.4rem);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box .title.is-4,
+section.section:has(.level-right a[href^="/admin"]) .box .title.is-5 {
+    color: var(--dark-text);
+    font-weight: 700;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .subtitle {
+    color: var(--light-text);
+}
+
+.tag {
+    border-radius: 999px;
+    font-weight: 600;
+    padding: 0.35rem 0.9rem;
+    border: none;
+}
+
+.tag.is-danger {
+    background: color-mix(in srgb, var(--eco-orange) 16%, transparent);
+    color: color-mix(in srgb, var(--eco-orange) 60%, var(--dark-text));
+}
+
+.tag.is-warning {
+    background: color-mix(in srgb, var(--warning-light) 35%, transparent);
+    color: var(--warning-dark);
+}
+
+.tag.is-success {
+    background: color-mix(in srgb, var(--eco-green) 18%, transparent);
+    color: color-mix(in srgb, var(--eco-green) 65%, var(--dark-text));
+}
+
+section.section:has(.level-right a[href^="/admin"]) .buttons .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 12px;
+    font-weight: 700;
+    padding: 0.65rem 1.25rem;
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.button.is-success,
+.button.is-info,
+.button.is-primary {
+    background: linear-gradient(
+        132deg,
+        color-mix(in srgb, var(--eco-green) 65%, var(--bg-white)) 0%,
+        color-mix(in srgb, var(--eco-orange) 55%, var(--bg-white)) 100%
+    );
+    color: var(--bg-white);
+    box-shadow: var(--shadow-md);
+}
+
+.button.is-danger {
+    background: linear-gradient(
+        132deg,
+        color-mix(in srgb, var(--danger-dark) 60%, var(--bg-white)) 0%,
+        color-mix(in srgb, var(--danger-dark) 80%, transparent) 90%
+    );
+    color: var(--bg-white);
+    box-shadow: var(--shadow-md);
+}
+
+.button.is-light {
+    background: color-mix(in srgb, var(--bg-light) 80%, var(--bg-white));
+    color: var(--dark-text);
+    border: 1px solid color-mix(in srgb, var(--border-color) 40%, transparent);
+    box-shadow: none;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+section.section:has(.level-right a[href^="/admin"]) .table {
+    width: 100%;
+    border-collapse: collapse;
+    background: color-mix(in srgb, var(--bg-white) 96%, transparent);
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .table thead th {
+    background: linear-gradient(
+        120deg,
+        color-mix(in srgb, var(--eco-green) 18%, transparent),
+        color-mix(in srgb, var(--eco-orange) 18%, transparent)
+    );
+    color: var(--dark-text);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.78rem;
+    padding: 0.95rem 1.15rem;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .table tbody td {
+    padding: 0.95rem 1.15rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--border-color) 85%, transparent);
+    color: var(--dark-text);
+}
+
+section.section:has(.level-right a[href^="/admin"]) .table tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--bg-light) 75%, transparent);
+}
+
+section.section:has(.level-right a[href^="/admin"]) .table tbody tr:hover {
+    background: color-mix(in srgb, var(--eco-orange) 8%, var(--bg-light));
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box ul {
+    margin-top: 1.1rem;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box ul li {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--border-color) 55%, transparent);
+    color: var(--dark-text);
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box ul li:last-child {
+    border-bottom: none;
+}
+
+section.section:has(.columns.is-centered) .columns.is-centered .box {
+    max-width: clamp(420px, 60vw, 540px);
+    margin: 0 auto;
+    border-radius: 26px;
+    border: 1px solid color-mix(in srgb, var(--eco-orange) 24%, transparent);
+    backdrop-filter: blur(10px);
+}
+
+section.section:has(.columns.is-centered) .title.is-3 {
+    font-size: clamp(1.75rem, 2.6vw, 2.1rem);
+    font-weight: 800;
+    color: var(--dark-text);
+    margin-bottom: 2rem;
+}
+
+section.section:has(.columns.is-centered) .field {
+    margin-bottom: 1.55rem;
+}
+
+section.section:has(.columns.is-centered) .label {
+    font-weight: 700;
+    color: var(--dark-text);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.65rem;
+}
+
+section.section:has(.columns.is-centered) .label i {
+    color: var(--eco-green);
+}
+
+section.section:has(.columns.is-centered) .input {
+    border-radius: 14px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 55%, transparent);
+    padding: 0.9rem 1.05rem;
+    background: color-mix(in srgb, var(--bg-white) 92%, transparent);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+section.section:has(.columns.is-centered) .input:focus {
+    border-color: color-mix(in srgb, var(--eco-orange) 55%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--eco-orange) 22%, transparent);
+}
+
+section.section:has(.columns.is-centered) .button.is-success.is-fullwidth,
+section.section:has(.columns.is-centered) .button.is-light.is-fullwidth {
+    border-radius: 14px;
+    padding: 0.95rem 1rem;
+    font-size: 1rem;
+    justify-content: center;
+}
+
+section.section:has(.buttons .fa-eye) {
+    background: linear-gradient(
+        145deg,
+        color-mix(in srgb, var(--eco-green) 20%, transparent) 0%,
+        color-mix(in srgb, var(--eco-orange) 16%, transparent) 55%,
+        color-mix(in srgb, var(--bg-white) 92%, transparent) 100%
+    );
+}
+
+section.section:has(.buttons .fa-eye) .level-right .button {
+    border-radius: 12px;
+    background: linear-gradient(
+        132deg,
+        color-mix(in srgb, var(--eco-green) 25%, transparent) 0%,
+        color-mix(in srgb, var(--eco-orange) 22%, transparent) 100%
+    );
+    color: var(--dark-text);
+    box-shadow: none;
+}
+
+section.section:has(.buttons .fa-eye) .box[style*="text-align: center"] {
+    padding: clamp(2.2rem, 4vw, 3rem) !important;
+    background: color-mix(in srgb, var(--bg-white) 92%, transparent);
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box[style*="margin-top: 2rem"] {
+    padding: 2rem;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box .level {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box .level-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box .level-left p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box .level-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box .level-right .buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box .buttons form {
+    display: inline-flex !important;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box .input[name="reason"] {
+    min-width: 280px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box .button.is-large {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+section.section:has(.level-right a[href^="/admin"]) .box .button.is-large i {
+    margin-right: 0.35rem;
+}
+
+section.section:has(.notification.is-warning.is-light p strong) .notification.is-warning.is-light {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--eco-orange) 20%, transparent);
+}
+
+section.section:has(.notification.is-warning.is-light p strong) .buttons .button {
+    min-width: 180px;
+}
+
+section.section:has(.notification.is-warning.is-light p strong) .box .buttons {
+    gap: 0.85rem;
+}
+
+section.section:has(.notification.is-warning.is-light p strong) .box .buttons .button.is-info {
+    background: linear-gradient(
+        132deg,
+        color-mix(in srgb, var(--eco-green) 25%, transparent),
+        color-mix(in srgb, var(--eco-orange) 20%, transparent)
+    );
+    color: var(--dark-text);
+}
+
+section.section:has(.notification.is-warning.is-light p strong) .content figure.image img {
+    border-radius: 12px;
+    box-shadow: 0 12px 28px color-mix(in srgb, var(--dark-text) 16%, transparent);
+}
+
+section.section:has(table.table) {
+    background: color-mix(in srgb, var(--bg-light) 85%, var(--bg-white));
+    padding: 3rem 1.5rem;
+}
+
+section.section:has(table.table)::before,
+section.section:has(table.table)::after {
+    display: none;
+}
+
+section.section:has(table.table) .title.is-2 {
+    color: var(--dark-text);
+    padding-bottom: 0.55rem;
+}
+
+section.section:has(table.table) .title.is-2::after {
+    background: color-mix(in srgb, var(--border-color) 60%, transparent);
+}
+
+section.section:has(table.table) .level-right .button {
+    border-radius: 10px;
+    padding: 0.6rem 1.3rem;
+    box-shadow: var(--shadow-sm);
+}
+
+section.section:has(table.table) .level-right .button.is-success {
+    margin-right: 0;
+    background: color-mix(in srgb, var(--eco-green) 65%, var(--bg-white));
+    background-image: none;
+    color: var(--bg-white);
+}
+
+section.section:has(table.table) .level-right .button:not(.is-success) {
+    background: color-mix(in srgb, var(--bg-white) 90%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border-color) 45%, transparent);
+    color: var(--dark-text);
+    box-shadow: none;
+}
+
+section.section:has(table.table) .box {
+    background: var(--bg-white);
+    border: 1px solid color-mix(in srgb, var(--border-color) 35%, transparent);
+    box-shadow: 0 12px 24px color-mix(in srgb, var(--dark-text) 12%, transparent);
+    border-radius: 18px;
+    overflow-x: auto;
+}
+
+section.section:has(table.table) .box[style*="margin-top: 2rem"] {
+    padding: 2.25rem;
+}
+
+section.section:has(table.table) .button.is-danger.is-small {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px color-mix(in srgb, var(--danger-dark) 18%, transparent);
+}
+
+section.section:has(table.table) .button.is-danger.is-small:hover {
+    transform: translateY(-1px);
+}
+
+section.section:has(table.table) .table {
+    background: var(--bg-white);
+    border-radius: 14px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 85%, transparent);
+    min-width: 640px;
+}
+
+section.section:has(table.table) .table thead th {
+    background: color-mix(in srgb, var(--border-color) 95%, var(--bg-white));
+    color: var(--dark-text);
+    letter-spacing: 0.06em;
+}
+
+section.section:has(table.table) .table tbody td {
+    background: var(--bg-white);
+}
+
+section.section:has(table.table) .table th,
+section.section:has(table.table) .table td {
+    white-space: normal;
+    word-break: break-word;
+}
+
+section.section:has(table.table) .table tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--bg-light) 80%, transparent);
+}
+
+section.section:has(table.table) .table tbody tr:hover {
+    background: color-mix(in srgb, var(--bg-light) 70%, var(--border-color) 30%);
+}
+
+section.section:has(table.table) .tag {
+    background: color-mix(in srgb, var(--border-color) 55%, var(--bg-white));
+    color: color-mix(in srgb, var(--light-text) 65%, var(--dark-text));
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+section.section:has(table.table) .tag.is-danger {
+    background: color-mix(in srgb, var(--danger-dark) 14%, transparent);
+    color: color-mix(in srgb, var(--danger-dark) 65%, var(--dark-text));
+}
+
+section.section:has(table.table) .tag.is-success {
+    background: color-mix(in srgb, var(--eco-green) 14%, transparent);
+    color: color-mix(in srgb, var(--eco-green) 65%, var(--dark-text));
+}
+
+section.section:has(table.table) .tag.is-warning {
+    background: color-mix(in srgb, var(--warning-dark) 14%, transparent);
+    color: color-mix(in srgb, var(--warning-dark) 65%, var(--dark-text));
+}
+
+section.section:has(.ingredients-grid) .ingredients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: clamp(1.5rem, 2.8vw, 2.25rem);
+    position: relative;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card {
+    position: relative;
+    border-radius: 22px;
+    padding: clamp(1.6rem, 2.4vw, 2.1rem);
+    background: color-mix(in srgb, var(--bg-white) 95%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border-color) 35%, transparent);
+    box-shadow: 0 16px 32px color-mix(in srgb, var(--dark-text) 10%, transparent);
+    backdrop-filter: blur(6px);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 38px color-mix(in srgb, var(--dark-text) 14%, transparent);
+}
+
+section.section:has(.ingredients-grid) .ingredient-card header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card header img {
+    width: clamp(62px, 7vw, 82px);
+    height: clamp(62px, 7vw, 82px);
+    object-fit: contain;
+    background: color-mix(in srgb, var(--bg-light) 85%, transparent);
+    border-radius: 18px;
+    padding: 0.65rem;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border-color) 35%, transparent);
+}
+
+section.section:has(.ingredients-grid) .ingredient-card header .title.is-5 {
+    margin-bottom: 0.3rem;
+    font-weight: 800;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .content {
+    color: var(--dark-text);
+    font-size: 0.96rem;
+    line-height: 1.7;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .content strong {
+    color: color-mix(in srgb, var(--dark-text) 90%, var(--eco-green));
+    font-weight: 700;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .ingredient-actions {
+    margin-top: 1.35rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .ingredient-actions .toggle-edit-btn,
+section.section:has(.ingredients-grid) .ingredient-card .ingredient-actions form {
+    flex: 1 1 clamp(180px, 45%, 240px);
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .toggle-edit-btn {
+    width: 100%;
+    border: none;
+    background: linear-gradient(
+        132deg,
+        color-mix(in srgb, var(--eco-green) 35%, transparent) 0%,
+        color-mix(in srgb, var(--eco-orange) 28%, transparent) 100%
+    );
+    color: var(--dark-text);
+    font-weight: 700;
+    padding: 0.55rem 1.2rem;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .toggle-edit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .toggle-edit-btn:active {
+    transform: translateY(0);
+}
+
+section.section:has(.ingredients-grid) .ingredient-card form .button.is-danger.is-light {
+    width: 100%;
+    justify-content: center;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(
+        132deg,
+        color-mix(in srgb, var(--danger-dark) 78%, transparent) 0%,
+        color-mix(in srgb, var(--danger-dark) 62%, var(--bg-white)) 100%
+    );
+    color: var(--bg-white);
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 1.2rem;
+    box-shadow: 0 16px 26px color-mix(in srgb, var(--danger-dark) 20%, transparent);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card form .button.is-danger.is-light i {
+    margin-right: 0.2rem;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card form .button.is-danger.is-light:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+    box-shadow: 0 20px 30px color-mix(in srgb, var(--danger-dark) 26%, transparent);
+}
+
+section.section:has(.ingredients-grid) .ingredient-card form .button.is-danger.is-light:active {
+    transform: translateY(0);
+    filter: brightness(0.98);
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .edit-form {
+    display: none;
+    margin-top: 1.35rem;
+    padding: clamp(1.55rem, 2.6vw, 2rem);
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--bg-white) 98%, transparent);
+    border: 1px solid color-mix(in srgb, var(--eco-orange) 30%, transparent);
+    box-shadow: 0 18px 36px color-mix(in srgb, var(--dark-text) 10%, transparent);
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .edit-form.active {
+    display: block;
+    animation: ingredientFormFade 0.25s ease;
+}
+
+@keyframes ingredientFormFade {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .edit-form .field {
+    margin-bottom: 1.1rem;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .edit-form .columns {
+    margin: 0 0 1rem 0;
+    gap: clamp(0.75rem, 1.8vw, 1.25rem);
+    flex-wrap: wrap;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .edit-form .columns .column {
+    padding: 0;
+    flex: 1 1 240px;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .edit-form .field .label {
+    font-weight: 700;
+    color: var(--dark-text);
+    margin-bottom: 0.45rem;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .edit-form .input,
+section.section:has(.ingredients-grid) .ingredient-card .edit-form .select select {
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 55%, transparent);
+    box-shadow: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .edit-form .input:focus,
+section.section:has(.ingredients-grid) .ingredient-card .edit-form .select select:focus {
+    border-color: color-mix(in srgb, var(--eco-orange) 50%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--eco-orange) 18%, transparent);
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .edit-form .buttons .button.is-success {
+    border-radius: 12px;
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--eco-green) 55%, transparent) 0%,
+        color-mix(in srgb, var(--eco-orange) 30%, transparent) 100%
+    );
+    border: none;
+    box-shadow: var(--shadow-md);
+}
+
+section.section:has(.ingredients-grid) .ingredient-card .edit-form .buttons .button.is-light {
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--border-color) 45%, transparent);
+}
+
+section.section:has(.ingredients-grid) .preview-image {
+    width: clamp(64px, 8vw, 96px);
+    height: clamp(64px, 8vw, 96px);
+    object-fit: contain;
+    border-radius: 18px;
+    padding: 0.75rem;
+    background: color-mix(in srgb, var(--bg-white) 92%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border-color) 40%, transparent);
+}
+
+section.section:has(.ingredients-grid) .icon-gallery {
+    margin-top: 1.1rem;
+    display: grid;
+    gap: 0.8rem;
+    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+}
+
+section.section:has(.ingredients-grid) .icon-gallery .icon-option {
+    border-radius: 14px;
+    padding: 0.5rem;
+    background: color-mix(in srgb, var(--bg-white) 92%, transparent);
+    border: 1px solid color-mix(in srgb, var(--border-color) 45%, transparent);
+    cursor: pointer;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+section.section:has(.ingredients-grid) .icon-gallery .icon-option:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--eco-orange) 45%, transparent);
+    box-shadow: var(--shadow-sm);
+}
+
+section.section:has(.ingredients-grid) .icon-gallery .icon-option.selected {
+    border-color: color-mix(in srgb, var(--eco-green) 60%, transparent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--eco-green) 20%, transparent);
+}
+
+section.section:has(.ingredients-grid) .icon-gallery .icon-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+section.section:has(.ingredients-grid) .file {
+    --file-shadow: 0 12px 24px color-mix(in srgb, var(--dark-text) 10%, transparent);
+}
+
+section.section:has(.ingredients-grid) .file-cta {
+    border-radius: 12px;
+    box-shadow: var(--file-shadow);
+    background: linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--eco-green) 35%, transparent) 0%,
+        color-mix(in srgb, var(--eco-orange) 28%, transparent) 100%
+    );
+    color: var(--dark-text);
+}
+
+section.section:has(.ingredients-grid) .file-label:hover .file-cta {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 28px color-mix(in srgb, var(--dark-text) 12%, transparent);
+}
+
+section.section:has(.ingredients-grid) .file-label:active .file-cta {
+    transform: translateY(0);
+}
+
+section.section:has(.ingredients-grid) .help {
+    color: color-mix(in srgb, var(--light-text) 75%, var(--dark-text));
+}
+
+section.section:has(.ingredients-grid) .ingredients-grid .notification.is-info,
+section.section:has(.ingredients-grid) .ingredients-grid .notification.is-warning,
+section.section:has(.ingredients-grid) .ingredients-grid .notification.is-success {
+    box-shadow: var(--shadow-sm);
+    border-radius: 14px;
+}
+
+/* Responsive */
+
+@media (max-width: 1200px) {
+    section.section:has(.level-right a[href^="/admin"]) {
+        padding: 3rem 1.25rem;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .box .input[name="reason"] {
+        min-width: 240px;
+    }
+
+    section.section:has(.ingredients-grid) .ingredients-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    section.section:has(.level-right a[href^="/admin"]) .box[style*="margin-top: 2rem"] {
+        padding: 1.8rem;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .box .level {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .box .level-left,
+    section.section:has(.level-right a[href^="/admin"]) .box .level-right {
+        width: 100%;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .box .level-right {
+        justify-content: flex-start;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .box .input[name="reason"] {
+        width: 100%;
+        min-width: 0;
+    }
+
+    section.section:has(.ingredients-grid) .ingredient-card {
+        padding: 1.45rem 1.6rem;
+    }
+
+    section.section:has(.ingredients-grid) .ingredient-card header {
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    section.section:has(.level-right a[href^="/admin"]) {
+        padding: 2.5rem 1rem;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .level {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.25rem;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .level-right {
+        width: 100%;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .buttons .button {
+        min-width: 100%;
+        justify-content: center;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .box .level-right {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .box .level-right .buttons {
+        width: 100%;
+    }
+
+    section.section:has(table.table) .box {
+        padding: 1.75rem;
+        overflow-x: auto;
+    }
+
+    section.section:has(table.table) .table {
+        display: block;
+        overflow-x: auto;
+        border-radius: 18px;
+        min-width: 560px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    section.section:has(table.table) .table th,
+    section.section:has(table.table) .table td {
+        font-size: 0.9rem;
+    }
+
+    section.section:has(.ingredients-grid) .ingredients-grid {
+        grid-template-columns: 1fr;
+    }
+
+    section.section:has(.ingredients-grid) .ingredient-card {
+        padding: 1.35rem 1.45rem;
+    }
+
+    section.section:has(.ingredients-grid) .ingredient-card .ingredient-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.85rem;
+    }
+
+    section.section:has(.ingredients-grid) .ingredient-card .ingredient-actions .toggle-edit-btn,
+    section.section:has(.ingredients-grid) .ingredient-card .ingredient-actions form {
+        flex: 1 1 auto;
+    }
+
+    section.section:has(.ingredients-grid) .icon-gallery {
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    }
+}
+
+@media (max-width: 540px) {
+    section.section:has(.level-right a[href^="/admin"]) {
+        padding: 2rem 0.75rem;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .title.is-2 {
+        display: block;
+        width: 100%;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .box[style*="margin-top: 2rem"] {
+        padding: 1.5rem;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .box .level {
+        gap: 1.25rem;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .box .level-right .buttons {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    section.section:has(.level-right a[href^="/admin"]) .box .button.is-large {
+        width: 100%;
+        justify-content: center;
+        padding: 0.55rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    section.section:has(table.table) .table {
+        min-width: 520px;
+    }
+
+    section.section:has(table.table) .table th,
+    section.section:has(table.table) .table td {
+        font-size: 0.85rem;
+        padding: 0.75rem 0.85rem;
+    }
+
+    section.section:has(table.table) .box {
+        padding: 1.5rem;
+    }
+
+    section.section:has(.ingredients-grid) .ingredient-card header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
+
+    section.section:has(.ingredients-grid) .ingredient-card {
+        padding: 1.25rem;
+    }
+
+    section.section:has(.ingredients-grid) .ingredient-card .edit-form {
+        padding: 1.1rem 1.2rem;
+    }
+
+    section.section:has(.ingredients-grid) .icon-gallery {
+        grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+    }
+}
+

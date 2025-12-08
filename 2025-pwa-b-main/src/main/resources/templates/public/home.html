@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <!-- HEAD commun -->
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>ECO Cook - Cuisinez malin, réduisez le gaspillage</title>
+    
+    <!-- CSS commun (navbar + footer) -->
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    
+    <!-- CSS personnalisé pour home -->
+    <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+<body>
+    
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="columns is-vcentered">
+                <div class="column is-6">
+                    <div class="hero-content">
+                        <div class="hero-badge">
+                            <i class="fas fa-leaf"></i>
+                            Rejoignez la communauté ECO Cook
+                        </div>
+                        <h1 class="hero-title">
+                            Cuisinez malin, réduisez le gaspillage 🌍
+                        </h1>
+                        <p class="hero-subtitle">
+                            ECO Cook vous aide à gérer intelligemment vos aliments. Scannez vos produits, recevez des alertes avant péremption et découvrez des recettes personnalisées pour ne plus jamais gaspiller.
+                        </p>
+                        <div class="hero-cta">
+                            <a th:href="@{/register}" class="btn-primary" sec:authorize="!isAuthenticated()">
+                                <span>Commencer gratuitement</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                            
+                            <a th:href="@{/pantry}" class="btn-primary" sec:authorize="isAuthenticated()">
+                                <span>Mon garde-manger</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                            
+                            <a th:href="@{/scanner}" class="btn-secondary">
+                                <i class="fas fa-barcode"></i>
+                                <span>Scanner un produit</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-6">
+                    <div class="hero-image">
+                        <div class="hero-image-main">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FEATURES SECTION -->
+    <section class="features-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-label">POURQUOI CHOISIR ECO COOK ?</div>
+                <h2 class="section-title">Des fonctionnalités pensées pour vous</h2>
+                <p class="section-description">
+                    Simplifiez votre quotidien, économisez de l'argent et agissez pour la planète avec notre solution tout-en-un de gestion alimentaire.
+                </p>
+            </div>
+            
+            <div class="columns is-multiline">
+                <div class="column is-6-tablet is-3-desktop">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <h3 class="feature-title">Scan intelligent</h3>
+                        <p class="feature-text">
+                            Ajoutez vos produits en un clin d'œil grâce à notre scanner de code-barres. Toutes les informations nutritionnelles sont récupérées automatiquement.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="column is-6-tablet is-3-desktop">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <h3 class="feature-title">Alertes intelligentes</h3>
+                        <p class="feature-text">
+                            Ne laissez plus rien périmer ! Recevez des notifications personnalisées plusieurs jours avant la date de péremption de vos aliments.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="column is-6-tablet is-3-desktop">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <h3 class="feature-title">Recettes adaptées</h3>
+                        <p class="feature-text">
+                            Découvrez des centaines de recettes anti-gaspi basées sur les ingrédients disponibles dans votre garde-manger. Zéro déchet, maximum de saveur !
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="column is-6-tablet is-3-desktop">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="feature-title">Suivi des économies</h3>
+                        <p class="feature-text">
+                            Visualisez vos économies en temps réel et mesurez votre impact environnemental. Chaque aliment sauvé compte !
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="how-section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-label">MODE D'EMPLOI</div>
+                <h2 class="section-title">Démarrez en 3 étapes simples</h2>
+                <p class="section-description">
+                    Transformez votre façon de cuisiner et de consommer en quelques minutes seulement. Aucune compétence technique requise !
+                </p>
+            </div>
+            
+            <div class="columns">
+                <div class="column is-4">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Scannez vos produits</h3>
+                        <p class="step-description">
+                            Utilisez votre smartphone pour scanner les codes-barres de vos courses. ECO Cook reconnaît automatiquement les produits et ajoute leurs dates de péremption.
+                        </p>
+                    </div>
+                </div>
+                <div class="column is-4">
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">Gérez votre garde-manger</h3>
+                        <p class="step-description">
+                            Consultez en un coup d'œil ce que vous avez chez vous. L'application vous alerte dès qu'un produit approche de sa date limite et vous suggère des recettes adaptées.
+                        </p>
+                    </div>
+                </div>
+                <div class="column is-4">
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">Cuisinez sans gaspiller</h3>
+                        <p class="step-description">
+                            Suivez nos recettes personnalisées pour utiliser vos ingrédients avant qu'ils ne périment. Économisez de l'argent tout en préservant la planète !
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA SECTION -->
+    <section class="cta-section">
+        <div class="container">
+            <h2 class="cta-title">Prêt à réduire votre gaspillage alimentaire ?</h2>
+            <p class="cta-subtitle">
+                Rejoignez des milliers d'utilisateurs qui font déjà des économies et agissent pour l'environnement
+            </p>
+            <a th:href="@{/register}" class="btn-cta-white" sec:authorize="!isAuthenticated()">
+                <span>Créer mon compte gratuit</span>
+                <i class="fas fa-rocket"></i>
+            </a>
+            <a th:href="@{/pantry}" class="btn-cta-white" sec:authorize="isAuthenticated()">
+                <span>Accéder à mon garde-manger</span>
+                <i class="fas fa-rocket"></i>
+            </a>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>
+
+</body>
+</html>

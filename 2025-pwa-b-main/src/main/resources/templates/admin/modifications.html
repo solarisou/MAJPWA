@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Modifications en attente - ECO Cook</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/recipes.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/compte-admin.css}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- MODIFICATIONS LIST -->
+    <section class="section">
+        <div class="container">
+            <div class="level">
+                <div class="level-left">
+                    <h1 class="title is-2">Modifications en attente de validation</h1>
+                </div>
+                <div class="level-right">
+                    <a th:href="@{/admin}" class="button">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Retour</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            <div th:if="${success}" class="notification is-success is-light">
+                <button class="delete" onclick="this.parentElement.remove()"></button>
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="notification is-danger is-light">
+                <button class="delete" onclick="this.parentElement.remove()"></button>
+                <span th:text="${error}"></span>
+            </div>
+            
+            <!-- Modifications List -->
+            <div th:if="${#lists.isEmpty(modifications)}" class="box" style="margin-top: 2rem; text-align: center; padding: 3rem;">
+                <i class="fas fa-check-circle fa-3x" style="color: var(--eco-green); margin-bottom: 1rem;"></i>
+                <p class="title is-4">Aucune modification en attente</p>
+                <p class="subtitle">Toutes les modifications ont été traitées.</p>
+            </div>
+            
+            <div th:if="${!#lists.isEmpty(modifications)}" style="margin-top: 2rem;">
+                <div th:each="modification : ${modifications}" class="box" style="margin-bottom: 1.5rem;">
+                    <div class="level">
+                        <div class="level-left">
+                            <div>
+                                <p class="title is-4" th:text="${modification.name}">Nom de la recette</p>
+                                <p class="subtitle is-6">
+                                    Recette originale: <a th:href="@{/recipes/{id}(id=${modification.originalRecipe.id})}" 
+                                                          th:text="${modification.originalRecipe.name}">Recette</a>
+                                </p>
+                                <p class="subtitle is-6">
+                                    Modifié par: <strong th:text="${modification.modifiedBy}">user</strong>
+                                    le <span th:text="${#temporals.format(modification.createdAt, 'dd/MM/yyyy à HH:mm')}">date</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="level-right">
+                            <div class="buttons">
+                                <a th:href="@{/admin/modifications/{id}(id=${modification.id})}" class="button is-info">
+                                    <i class="fas fa-eye"></i>
+                                    <span>Voir les détails</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>
+</body>
+</html>
+

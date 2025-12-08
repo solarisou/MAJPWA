@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Créer un compte admin - ECO Cook</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/compte-admin.css}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- CREATE ADMIN FORM -->
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-half">
+                    <div class="box">
+                        <h1 class="title is-3 has-text-centered">Créer un compte administrateur</h1>
+                        
+                        <!-- Messages -->
+                        <div th:if="${success}" class="notification is-success is-light">
+                            <button class="delete" onclick="this.parentElement.remove()"></button>
+                            <span th:text="${success}"></span>
+                        </div>
+                        <div th:if="${error}" class="notification is-danger is-light">
+                            <button class="delete" onclick="this.parentElement.remove()"></button>
+                            <span th:text="${error}"></span>
+                        </div>
+                        
+                        <form th:action="@{/admin/users/create-admin}" 
+                              th:object="${form}" 
+                              method="post"
+                              enctype="multipart/form-data">
+                            
+                            <div class="field">
+                                <label class="label">
+                                    <i class="fas fa-envelope"></i>
+                                    Email
+                                </label>
+                                <div class="control">
+                                    <input class="input" 
+                                           type="email" 
+                                           th:field="*{userName}" 
+                                           placeholder="email@exemple.com" 
+                                           required>
+                                </div>
+                            </div>
+                            
+                            <div class="field">
+                                <label class="label">
+                                    <i class="fas fa-user"></i>
+                                    Nom d'affichage
+                                </label>
+                                <div class="control">
+                                    <input class="input" 
+                                           type="text" 
+                                           th:field="*{displayName}" 
+                                           placeholder="Nom d'affichage" 
+                                           required>
+                                </div>
+                            </div>
+                            
+                            <div class="field">
+                                <label class="label">
+                                    <i class="fas fa-lock"></i>
+                                    Mot de passe
+                                </label>
+                                <div class="control has-icons-right">
+                                    <input class="input" 
+                                           type="password" 
+                                           th:field="*{password}" 
+                                           placeholder="Minimum 6 caractères" 
+                                           required 
+                                           minlength="6"
+                                           id="password">
+                                    <span class="icon is-right is-clickable" onclick="togglePassword('password', 'toggleIcon')">
+                                        <i class="fas fa-eye" id="toggleIcon"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="field">
+                                <label class="label">
+                                    <i class="fas fa-lock"></i>
+                                    Confirmer le mot de passe
+                                </label>
+                                <div class="control has-icons-right">
+                                    <input class="input" 
+                                           type="password" 
+                                           th:field="*{confirmPassword}" 
+                                           placeholder="Confirmez le mot de passe" 
+                                           required 
+                                           minlength="6"
+                                           id="confirmPassword">
+                                    <span class="icon is-right is-clickable" onclick="togglePassword('confirmPassword', 'toggleIcon2')">
+                                        <i class="fas fa-eye" id="toggleIcon2"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="field">
+                                <div class="control">
+                                    <button type="submit" class="button is-success is-fullwidth">
+                                        <i class="fas fa-user-plus"></i>
+                                        <span>Créer le compte admin</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="field">
+                                <div class="control">
+                                    <a th:href="@{/admin/users}" class="button is-light is-fullwidth">
+                                        <i class="fas fa-arrow-left"></i>
+                                        <span>Retour</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>
+    <script th:src="@{/js/login.js}"></script>
+    <script th:src="@{/js/register-validation.js}"></script>
+</body>
+</html>
+

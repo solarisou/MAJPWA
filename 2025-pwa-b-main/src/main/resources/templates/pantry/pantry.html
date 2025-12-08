@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Garde-manger - ECO Cook</title>
+    <th:block th:replace="~{fragments/head :: common-styles}"></th:block>
+    <link rel="stylesheet" th:href=@{css/pantry.css}>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- PANTRY SECTION -->
+    <section class="section">
+        <div class="container">
+            <div class="level mb-5">
+                <div class="level-left">
+                    <div class="level-item">
+                        <div>
+                            <h1 class="title is-2">Mon Garde-manger</h1>
+                            <p class="subtitle">Gérez vos produits par espace de stockage</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="level-right">
+                    <div class="level-item">
+                        <span class="tag is-primary is-large">
+                            <strong th:text="${#lists.size(products)}">0</strong>&nbsp;produits
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            <div class="notification is-success is-light" th:if="${success}">
+                <button class="delete"></button>
+                <span th:text="${success}"></span>
+            </div>
+            <div class="notification is-danger is-light" th:if="${error}">
+                <button class="delete"></button>
+                <span th:text="${error}"></span>
+            </div>
+            
+            <!-- Formulaire d'ajout -->
+            <div class="box mb-5">
+                <h2 class="title is-4">Ajouter un produit</h2>
+                <form th:action="@{/pantry/add}" method="post">
+                    <div class="columns">
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Nom du produit</label>
+                                <div class="control has-icons-left">
+                                    <input class="input" type="text" name="name" id="product-name-input"
+                                           placeholder="Ex: Tomates, Lait, Pain..." 
+                                           autocomplete="off"
+                                           required>
+                                    <span class="icon is-left">
+                                        <i class="fas fa-apple-alt"></i>
+                                    </span>
+                                </div>
+                                <div class="product-suggestions" id="product-suggestions-list"></div>
+                                <div class="product-icon-preview">
+                                    <img id="product-icon-preview" src="/images/logoPannier.svg" alt="Icône produit">
+                                    <span class="help">Aperçu de l'ingrédient sélectionné</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="column is-2">
+                            <div class="field">
+                                <label class="label">Quantité</label>
+                                <div class="control has-icons-left">
+                                    <input class="input" type="number" name="quantity" 
+                                           min="1" value="1" required>
+                                    <span class="icon is-left">
+                                        <i class="fas fa-hashtag"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="column is-2">
+                            <div class="field">
+                                <label class="label">Unité</label>
+                                <div class="control">
+                                    <input class="input" type="text" name="unit" id="unit-input"
+                                           placeholder="kg, L, g...">
+                                </div>
+                                <p class="help">Auto-rempli</p>
+                            </div>
+                        </div>
+                        
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Type de stockage</label>
+                                <div class="control has-icons-left">
+                                    <div class="select is-fullwidth">
+                                        <select name="storageType" required>
+                                            <option value="frigo">Frigo</option>
+                                            <option value="congelateur">Congélateur</option>
+                                            <option value="placard" selected>Placard</option>
+                                            <option value="panier">Panier</option>
+                                        </select>
+                                    </div>
+                                    <span class="icon is-left">
+                                        <i class="fas fa-box"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Date de péremption</label>
+                                <div class="control has-icons-left">
+                                    <input class="input" type="date" name="expiryDate" id="expiry-date-input" required
+                                           th:min="${#temporals.format(#temporals.createNow().minusDays(3), 'yyyy-MM-dd')}">
+                                    <span class="icon is-left">
+                                        <i class="fas fa-calendar"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="column is-narrow">
+                            <div class="field">
+                                <label class="label">&nbsp;</label>
+                                <div class="control">
+                                    <button type="submit" class="button is-primary">
+                                        <span class="icon">
+                                            <i class="fas fa-plus"></i>
+                                        </span>
+                                        <span>Ajouter</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Espaces de stockage - NOUVEAU LAYOUT -->
+            <div class="storage-grid">
+                
+                <!-- FRIGO -->
+                <div class="storage-box frigo">
+                    <img src="/images/logoFrigo.svg" class="storage-icon" alt="Frigo">
+                    <div class="storage-content">
+                        <div class="storage-title">Frigo</div>
+                        <div class="storage-count" th:text="${#lists.size(frigo)}">0</div>
+                    </div>
+                    <div class="product-list" th:if="${!#lists.isEmpty(frigo)}">
+                        <div class="product-item" th:each="product : ${frigo}">
+                            <div>
+                                <span class="product-name" th:text="${product.name}">Produit</span>
+                                <span class="product-qty">
+                                    <span th:text="${product.quantity}">1</span>
+                                    <span th:if="${product.unit != null}" th:text="' ' + ${product.unit}">kg</span>
+                                </span>
+                                <span th:if="${reserved.containsKey(product.name.toLowerCase())}" 
+                                      class="status-badge" 
+                                      style="background: var(--warning-light); color: var(--warning-dark);">
+                                    <i class="fas fa-utensils"></i>
+                                    <span th:text="${reserved.get(product.name.toLowerCase())}">20</span>
+                                    <span th:if="${product.unit != null}" th:text="${product.unit}">g</span> réservé
+                                </span>
+                                <span th:if="${product.expired}" class="status-badge status-danger">Expiré</span>
+                                <span th:if="${product.expiringSoon and !product.expired}" class="status-badge status-warning">Bientôt</span>
+                                <span th:if="${!product.expiringSoon and !product.expired}" class="status-badge status-ok">OK</span>
+                                <br>
+                                <small class="product-date" th:text="'Expire le ' + ${#temporals.format(product.expiryDate, 'dd/MM/yyyy')}">Date</small>
+                            </div>
+                            <form th:action="@{/pantry/delete}" method="post" style="display: inline;">
+                                <input type="hidden" name="id" th:value="${product.id}">
+                                <button type="submit" class="delete-btn" 
+                                        onclick="return confirm('Supprimer ce produit ?');">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="empty-storage" th:if="${#lists.isEmpty(frigo)}">
+                        <p>Frigo vide</p>
+                    </div>
+                </div>
+                
+                <!-- PLACARD -->
+                <div class="storage-box placard">
+                    <img src="/images/logoPlacard.svg" class="storage-icon" alt="Placard">
+                    <div class="storage-content">
+                        <div class="storage-title">Placard</div>
+                        <div class="storage-count" th:text="${#lists.size(placard)}">0</div>
+                    </div>
+                    <div class="product-list" th:if="${!#lists.isEmpty(placard)}">
+                        <div class="product-item" th:each="product : ${placard}">
+                            <div>
+                                <span class="product-name" th:text="${product.name}">Produit</span>
+                                <span class="product-qty">
+                                    <span th:text="${product.quantity}">1</span>
+                                    <span th:if="${product.unit != null}" th:text="' ' + ${product.unit}">kg</span>
+                                </span>
+                                <span th:if="${reserved.containsKey(product.name.toLowerCase())}" 
+                                      class="status-badge" 
+                                      style="background: var(--warning-light); color: var(--warning-dark);">
+                                    <i class="fas fa-utensils"></i>
+                                    <span th:text="${reserved.get(product.name.toLowerCase())}">20</span>
+                                    <span th:if="${product.unit != null}" th:text="${product.unit}">g</span> réservé
+                                </span>
+                                <span th:if="${product.expired}" class="status-badge status-danger">Expiré</span>
+                                <span th:if="${product.expiringSoon and !product.expired}" class="status-badge status-warning">Bientôt</span>
+                                <span th:if="${!product.expiringSoon and !product.expired}" class="status-badge status-ok">OK</span>
+                                <br>
+                                <small class="product-date" th:text="'Expire le ' + ${#temporals.format(product.expiryDate, 'dd/MM/yyyy')}">Date</small>
+                            </div>
+                            <form th:action="@{/pantry/delete}" method="post" style="display: inline;">
+                                <input type="hidden" name="id" th:value="${product.id}">
+                                <button type="submit" class="delete-btn" 
+                                        onclick="return confirm('Supprimer ce produit ?');">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="empty-storage" th:if="${#lists.isEmpty(placard)}">
+                        <p>Placard vide</p>
+                    </div>
+                </div>
+                
+                <!-- CONGÉLATEUR -->
+                <div class="storage-box congelateur">
+                    <img src="/images/logoCongelateur.svg" class="storage-icon" alt="Congélateur">
+                    <div class="storage-content">
+                        <div class="storage-title">Congélateur</div>
+                        <div class="storage-count" th:text="${#lists.size(congelateur)}">0</div>
+                    </div>
+                    <div class="product-list" th:if="${!#lists.isEmpty(congelateur)}">
+                        <div class="product-item" th:each="product : ${congelateur}">
+                            <div>
+                                <span class="product-name" th:text="${product.name}">Produit</span>
+                                <span class="product-qty">
+                                    <span th:text="${product.quantity}">1</span>
+                                    <span th:if="${product.unit != null}" th:text="' ' + ${product.unit}">kg</span>
+                                </span>
+                                <span th:if="${reserved.containsKey(product.name.toLowerCase())}" 
+                                      class="status-badge" 
+                                      style="background: var(--warning-light); color: var(--warning-dark);">
+                                    <i class="fas fa-utensils"></i>
+                                    <span th:text="${reserved.get(product.name.toLowerCase())}">20</span>
+                                    <span th:if="${product.unit != null}" th:text="${product.unit}">g</span> réservé
+                                </span>
+                                <span th:if="${product.expired}" class="status-badge status-danger">Expiré</span>
+                                <span th:if="${product.expiringSoon and !product.expired}" class="status-badge status-warning">Bientôt</span>
+                                <span th:if="${!product.expiringSoon and !product.expired}" class="status-badge status-ok">OK</span>
+                                <br>
+                                <small class="product-date" th:text="'Expire le ' + ${#temporals.format(product.expiryDate, 'dd/MM/yyyy')}">Date</small>
+                            </div>
+                            <form th:action="@{/pantry/delete}" method="post" style="display: inline;">
+                                <input type="hidden" name="id" th:value="${product.id}">
+                                <button type="submit" class="delete-btn" 
+                                        onclick="return confirm('Supprimer ce produit ?');">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="empty-storage" th:if="${#lists.isEmpty(congelateur)}">
+                        <p>Congélateur vide</p>
+                    </div>
+                </div>
+                
+                <!-- PANIER -->
+                <div class="storage-box panier">
+                    <img src="/images/logoPannier.svg" class="storage-icon" alt="Panier">
+                    <div class="storage-content">
+                        <div class="storage-title">Panier</div>
+                        <div class="storage-count" th:text="${#lists.size(panier)}">0</div>
+                    </div>
+                    <div class="product-list" th:if="${!#lists.isEmpty(panier)}">
+                        <div class="product-item" th:each="product : ${panier}">
+                            <div>
+                                <span class="product-name" th:text="${product.name}">Produit</span>
+                                <span class="product-qty">
+                                    <span th:text="${product.quantity}">1</span>
+                                    <span th:if="${product.unit != null}" th:text="' ' + ${product.unit}">kg</span>
+                                </span>
+                                <span th:if="${reserved.containsKey(product.name.toLowerCase())}" 
+                                      class="status-badge" 
+                                      style="background: var(--warning-light); color: var(--warning-dark);">
+                                    <i class="fas fa-utensils"></i>
+                                    <span th:text="${reserved.get(product.name.toLowerCase())}">20</span>
+                                    <span th:if="${product.unit != null}" th:text="${product.unit}">g</span> réservé
+                                </span>
+                                <span th:if="${product.expired}" class="status-badge status-danger">Expiré</span>
+                                <span th:if="${product.expiringSoon and !product.expired}" class="status-badge status-warning">Bientôt</span>
+                                <span th:if="${!product.expiringSoon and !product.expired}" class="status-badge status-ok">OK</span>
+                                <br>
+                                <small class="product-date" th:text="'Expire le ' + ${#temporals.format(product.expiryDate, 'dd/MM/yyyy')}">Date</small>
+                            </div>
+                            <form th:action="@{/pantry/delete}" method="post" style="display: inline;">
+                                <input type="hidden" name="id" th:value="${product.id}">
+                                <button type="submit" class="delete-btn" 
+                                        onclick="return confirm('Supprimer ce produit ?');">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="empty-storage" th:if="${#lists.isEmpty(panier)}">
+                        <p>Panier vide</p>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.notification .delete').forEach(deleteButton => {
+                deleteButton.addEventListener('click', function() {
+                    this.parentElement.remove();
+                });
+            });
+            
+            setTimeout(() => {
+                document.querySelectorAll('.notification').forEach(notif => {
+                    notif.style.transition = 'opacity 0.5s';
+                    notif.style.opacity = '0';
+                    setTimeout(() => notif.remove(), 500);
+                });
+            }, 5000);
+            
+            document.querySelectorAll('.storage-box').forEach(box => {
+                box.addEventListener('click', function(e) {
+                    if (e.target.closest('.delete-btn') || e.target.closest('form')) {
+                        return;
+                    }
+                    
+                    this.classList.toggle('expanded');
+                });
+            });
+            
+            const productInput = document.getElementById('product-name-input');
+            const storageSelect = document.querySelector('select[name="storageType"]');
+            const unitInput = document.getElementById('unit-input');
+            const expiryDateInput = document.getElementById('expiry-date-input');
+            const iconPreview = document.getElementById('product-icon-preview');
+            const defaultIcon = iconPreview ? iconPreview.getAttribute('src') : '/images/logoPannier.svg';
+            const suggestionsContainer = document.getElementById('product-suggestions-list');
+
+            const renderProductSuggestions = (suggestions) => {
+                if (!suggestionsContainer) {
+                    return;
+                }
+
+                suggestionsContainer.innerHTML = '';
+                if (!suggestions || suggestions.length === 0) {
+                    suggestionsContainer.classList.remove('is-active');
+                    return;
+                }
+
+                const listWrapper = document.createElement('div');
+                listWrapper.className = 'suggestion-list';
+
+                suggestions.forEach(suggestion => {
+                    const item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'product-suggestion-item';
+                    const iconPath = suggestion.iconPath || defaultIcon;
+                    item.innerHTML = `
+                        <img src="${iconPath}" alt="${suggestion.displayName}">
+                        <div class="suggestion-info">
+                            <span>${suggestion.displayName}</span>
+                            ${suggestion.defaultUnit ? `<small>Unité : ${suggestion.defaultUnit}</small>` : ''}
+                        </div>
+                    `;
+                    item.addEventListener('mousedown', (e) => {
+                        e.preventDefault();
+                    });
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        productInput.value = suggestion.displayName;
+                        fetchProductDetails(suggestion.displayName);
+                        clearProductSuggestions();
+                        productInput.focus();
+                    });
+                    listWrapper.appendChild(item);
+                });
+
+                suggestionsContainer.appendChild(listWrapper);
+                suggestionsContainer.classList.add('is-active');
+            };
+
+            const clearProductSuggestions = () => {
+                if (suggestionsContainer) {
+                    suggestionsContainer.innerHTML = '';
+                    suggestionsContainer.classList.remove('is-active');
+                }
+            };
+
+            const resetFields = () => {
+                if (unitInput) {
+                    unitInput.value = '';
+                    unitInput.style.background = '';
+                }
+                if (expiryDateInput) {
+                    expiryDateInput.value = '';
+                    expiryDateInput.style.background = '';
+                }
+                if (iconPreview) {
+                    iconPreview.src = defaultIcon;
+                    iconPreview.style.background = '';
+                }
+            };
+
+            const fetchProductDetails = (productName) => {
+                fetch(`/api/products/details?name=${encodeURIComponent(productName)}`)
+                    .then(response => response.json())
+                    .then(product => {
+                        if (product) {
+                            if (product.defaultStorageType && storageSelect) {
+                                storageSelect.value = product.defaultStorageType;
+                            }
+                            if (product.defaultUnit && unitInput) {
+                                unitInput.value = product.defaultUnit;
+                                unitInput.style.background = '#e8f5e9';
+                            }
+                            if (product.defaultShelfLife && expiryDateInput) {
+                                const today = new Date();
+                                today.setDate(today.getDate() + product.defaultShelfLife);
+                                const formattedDate = today.toISOString().split('T')[0];
+                                expiryDateInput.value = formattedDate;
+                                expiryDateInput.style.background = '#e8f5e9';
+                            }
+                            if (iconPreview) {
+                                if (product.iconPath) {
+                                    iconPreview.src = product.iconPath;
+                                    iconPreview.style.background = '#f0fdf4';
+                                } else {
+                                    iconPreview.src = defaultIcon;
+                                    iconPreview.style.background = '';
+                                }
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.log('Produit non trouvé dans le catalogue');
+                        resetFields();
+                    });
+            };
+
+            if (productInput) {
+                productInput.addEventListener('input', function() {
+                    const query = this.value;
+                    if (query.length >= 2) {
+                        fetch(`/api/products/search?query=${encodeURIComponent(query)}`)
+                            .then(response => response.json())
+                            .then(products => {
+                                renderProductSuggestions(products);
+                            })
+                            .catch(() => clearProductSuggestions());
+                    } else {
+                        clearProductSuggestions();
+                        resetFields();
+                    }
+                });
+                
+                productInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Tab' && suggestionsContainer.classList.contains('is-active')) {
+                        const firstSuggestion = suggestionsContainer.querySelector('.product-suggestion-item');
+                        if (firstSuggestion) {
+                            e.preventDefault();
+                            firstSuggestion.click();
+                        }
+                    }
+                });
+                
+                productInput.addEventListener('change', function() {
+                    const productName = this.value;
+                    if (productName) {
+                        fetchProductDetails(productName);
+                        clearProductSuggestions();
+                    } else {
+                        resetFields();
+                        clearProductSuggestions();
+                    }
+                });
+            }
+
+            document.addEventListener('click', function(e) {
+                if (!productInput || !suggestionsContainer) {
+                    return;
+                }
+                if (!productInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                    clearProductSuggestions();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

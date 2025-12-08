@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Scanner - ECO Cook</title>
+    <th:block th:replace="~{fragments/head :: common-styles}"></th:block>
+    <!-- QuaggaJS pour scanner les codes-barres -->
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.4/dist/quagga.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/scanner.css}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- SCANNER SECTION -->
+    <section class="section">
+        <div class="container">
+            <h1 class="title is-2">Scanner de code-barres</h1>
+            <p class="subtitle">Scannez le code-barres de votre produit</p>
+            <!-- Messages -->
+            <div class="notification is-success is-light" th:if="${success}">
+                <button class="delete"></button>
+                <span th:text="${success}"></span>
+            </div>
+            <div class="notification is-danger is-light" th:if="${error}">
+                <button class="delete"></button>
+                <span th:text="${error}"></span>
+            </div>
+            
+            <!-- Scanner de code-barres -->
+            <div class="box">
+                <h2 class="title is-4 has-text-centered">
+                    <span class="icon">
+                        <i class="fas fa-barcode"></i>
+                    </span>
+                    Scanner en temps réel
+                </h2>
+                
+                <div id="camera-container">
+                    <div id="barcode-scanner" class="hidden">
+                        <div class="scan-overlay"></div>
+                        <div class="capture-guide">
+                            Centrez le code-barres dans le cadre vert
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="buttons is-centered mt-4">
+                    <button id="start-scanner" class="button is-primary is-large">
+                        <span class="icon">
+                            <i class="fas fa-camera"></i>
+                        </span>
+                        <span>Démarrer le scanner</span>
+                    </button>
+                    <button id="stop-scanner" class="button is-danger" style="display: none;">
+                        <span class="icon">
+                            <i class="fas fa-stop"></i>
+                        </span>
+                        <span>Arrêter</span>
+                    </button>
+                </div>
+                
+                <!-- Statut du scanner -->
+                <div class="scanner-status" id="scanner-status">
+                    <p class="has-text-grey">En attente de code-barres...</p>
+                </div>
+            </div>
+            
+            <!-- Saisie manuelle du code-barres -->
+            <div class="box" id="manual-input">
+                <h2 class="title is-4 has-text-centered">
+                    <span class="icon">
+                        <i class="fas fa-keyboard"></i>
+                    </span>
+                    Ou saisie manuelle
+                </h2>
+                
+                <div class="field">
+                    <div class="control">
+                        <input class="input is-large has-text-centered" 
+                               type="text" 
+                               id="manual-barcode" 
+                               placeholder="3268840001008"
+                               pattern="[0-9]{8,13}"
+                               inputmode="numeric"
+                               style="font-size: 2rem; font-weight: bold; letter-spacing: 3px;">
+                    </div>
+                </div>
+                
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-primary is-large is-fullwidth" id="search-barcode">
+                            <span class="icon">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <span>Rechercher le produit</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Exemples de codes-barres populaires -->
+                <div class="mt-5">
+                    <p class="has-text-weight-bold has-text-centered mb-3">Ou testez avec ces exemples :</p>
+                    <div class="buttons is-centered">
+                        <button class="button is-light example-barcode" data-code="3268840001008">
+                            <span class="icon"><i class="fas fa-tint"></i></span>
+                            <span>Cristaline</span>
+                        </button>
+                        <button class="button is-light example-barcode" data-code="3017620422003">
+                            <span class="icon"><i class="fas fa-cookie"></i></span>
+                            <span>Nutella</span>
+                        </button>
+                        <button class="button is-light example-barcode" data-code="3033710065967">
+                            <span class="icon"><i class="fas fa-mug-hot"></i></span>
+                            <span>Nesquik</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Aperçu du produit trouvé -->
+            <div class="box product-preview" id="product-preview">
+                <h2 class="title is-4">Produit trouvé</h2>
+                
+                <div class="columns">
+                    <div class="column is-one-third">
+                        <figure class="image">
+                            <img id="product-image" src="" alt="Produit">
+                        </figure>
+                    </div>
+                    <div class="column">
+                        <h3 class="title is-3" id="product-name"></h3>
+                        <p class="subtitle" id="product-brands"></p>
+                        <p id="product-generic"></p>
+                        <p class="has-text-grey" id="product-categories"></p>
+                    </div>
+                </div>
+                
+                <!-- Formulaire d'ajout -->
+                <form th:action="@{/scanner/add}" method="post" id="add-product-form">
+                    <input type="hidden" name="name" id="form-product-name">
+                    <input type="hidden" name="barcode" id="form-barcode">
+                    
+                    <div class="columns">
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Quantité</label>
+                                <div class="control">
+                                    <input class="input" type="number" name="quantity" 
+                                           min="1" value="1" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Date de péremption</label>
+                                <div class="control">
+                                    <input class="input" type="date" name="expiryDate" required
+                                           th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="field">
+                        <label class="label">Où stocker ce produit ?</label>
+                        <div class="storage-selector">
+                            <label class="storage-option" data-storage="frigo">
+                                <input type="radio" name="storageType" value="frigo">
+                                <div class="icon is-large">
+                                    <i class="fas fa-snowflake fa-2x"></i>
+                                </div>
+                                <p class="has-text-weight-bold mt-2">Frigo</p>
+                            </label>
+                            
+                            <label class="storage-option" data-storage="congelateur">
+                                <input type="radio" name="storageType" value="congelateur">
+                                <div class="icon is-large">
+                                    <i class="fas fa-ice-cream fa-2x"></i>
+                                </div>
+                                <p class="has-text-weight-bold mt-2">Congélateur</p>
+                            </label>
+                            
+                            <label class="storage-option" data-storage="placard">
+                                <input type="radio" name="storageType" value="placard">
+                                <div class="icon is-large">
+                                    <i class="fas fa-box fa-2x"></i>
+                                </div>
+                                <p class="has-text-weight-bold mt-2">Placard</p>
+                            </label>
+                            
+                            <label class="storage-option" data-storage="panier">
+                                <input type="radio" name="storageType" value="panier">
+                                <div class="icon is-large">
+                                    <i class="fas fa-shopping-basket fa-2x"></i>
+                                </div>
+                                <p class="has-text-weight-bold mt-2">Panier</p>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button type="submit" class="button is-primary is-large">
+                                <span class="icon">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                <span>Ajouter au garde-manger</span>
+                            </button>
+                        </div>
+                        <div class="control">
+                            <button type="button" class="button is-light is-large" id="cancel-add">
+                                <span>Annuler</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>  
+    <script>
+        let isScanning = false;
+        let lastScannedCode = null;
+        let scanCooldown = false;
+        
+        document.getElementById('start-scanner').addEventListener('click', function() {
+            startBarcodeScanner();
+        });
+        
+        document.getElementById('stop-scanner').addEventListener('click', function() {
+            stopBarcodeScanner();
+        });
+        
+        function startBarcodeScanner() {
+            const scannerElement = document.getElementById('barcode-scanner');
+            scannerElement.classList.remove('hidden');
+            
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: scannerElement,
+                    constraints: {
+                        width: 640,
+                        height: 480,
+                        facingMode: "environment"
+                    },
+                },
+                decoder: {
+                    readers: [
+                        "ean_reader",
+                        "ean_8_reader",
+                        "upc_reader",
+                        "upc_e_reader",
+                        "code_128_reader",
+                        "code_39_reader"
+                    ],
+                    multiple: false
+                },
+                locate: true,
+                locator: {
+                    halfSample: true,
+                    patchSize: "medium"
+                },
+                numOfWorkers: 4,
+                frequency: 10,
+            }, function(err) {
+                if (err) {
+                    console.error('Erreur initialisation scanner:', err);
+                    alert('Impossible de démarrer le scanner. Vérifiez les permissions de la caméra.');
+                    return;
+                }
+                console.log("Scanner initialisé");
+                Quagga.start();
+                isScanning = true;
+                
+                document.getElementById('start-scanner').style.display = 'none';
+                document.getElementById('stop-scanner').style.display = 'inline-flex';
+                document.getElementById('scanner-status').classList.add('active');
+                document.getElementById('scanner-status').innerHTML = '<p class="has-text-grey">Recherche de code-barres...</p>';
+            });
+            
+            Quagga.onDetected(function(result) {
+                if (scanCooldown) return;
+                
+                const code = result.codeResult.code;
+                console.log("Code-barres détecté:", code);
+                
+                if (code === lastScannedCode) return;
+                
+                lastScannedCode = code;
+                scanCooldown = true;
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate([200, 100, 200]);
+                }
+                
+                document.getElementById('scanner-status').innerHTML = 
+                    `<p class="has-text-success has-text-weight-bold">Code détecté</p>
+                     <p class="detected-barcode">${code}</p>`;
+                
+                document.getElementById('manual-barcode').value = code;
+                stopBarcodeScanner();
+                
+                setTimeout(() => {
+                    searchProduct(code);
+                    scanCooldown = false;
+                }, 500);
+            });
+        }
+        
+        function stopBarcodeScanner() {
+            if (isScanning) {
+                Quagga.stop();
+                isScanning = false;
+                document.getElementById('barcode-scanner').classList.add('hidden');
+                document.getElementById('start-scanner').style.display = 'inline-flex';
+                document.getElementById('stop-scanner').style.display = 'none';
+            }
+        }
+        
+        document.getElementById('search-barcode').addEventListener('click', function() {
+            const barcode = document.getElementById('manual-barcode').value.trim();
+            if (barcode && barcode.length >= 8) {
+                searchProduct(barcode);
+            } else {
+                alert('Veuillez entrer un code-barres valide (8-13 chiffres)');
+            }
+        });
+        
+        document.getElementById('manual-barcode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const barcode = this.value.trim();
+                if (barcode && barcode.length >= 8) {
+                    searchProduct(barcode);
+                }
+            }
+        });
+        
+        document.querySelectorAll('.example-barcode').forEach(button => {
+            button.addEventListener('click', function() {
+                const code = this.getAttribute('data-code');
+                document.getElementById('manual-barcode').value = code;
+                searchProduct(code);
+            });
+        });
+        
+        document.querySelectorAll('.storage-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.storage-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                this.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+        
+        document.getElementById('cancel-add').addEventListener('click', function() {
+            document.getElementById('product-preview').classList.remove('active');
+            document.getElementById('manual-barcode').value = '';
+            lastScannedCode = null;
+        });
+        
+        function searchProduct(barcode) {
+            document.getElementById('scanner-status').innerHTML = 
+                '<p class="has-text-grey">Recherche du produit...</p>';
+            document.getElementById('scanner-status').classList.add('active');
+            
+            fetch(`/scanner/api/scan/${barcode}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Produit non trouvé');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('scanner-status').classList.remove('active');
+                    displayProduct(data, barcode);
+                })
+                .catch(error => {
+                    document.getElementById('scanner-status').innerHTML = 
+                        '<p class="has-text-danger">Produit non trouvé dans la base OpenFoodFacts</p>';
+                    setTimeout(() => {
+                        document.getElementById('scanner-status').classList.remove('active');
+                    }, 3000);
+                    console.error(error);
+                });
+        }
+        
+        function displayProduct(data, barcode) {
+            document.getElementById('product-name').textContent = data.name;
+            document.getElementById('product-brands').textContent = data.brands || '';
+            document.getElementById('product-generic').textContent = data.genericName || '';
+            document.getElementById('product-categories').textContent = data.categories || '';
+            
+            if (data.imageUrl) {
+                document.getElementById('product-image').src = data.imageUrl;
+                document.getElementById('product-image').style.display = 'block';
+            } else {
+                document.getElementById('product-image').style.display = 'none';
+            }
+            
+            document.getElementById('form-product-name').value = data.name;
+            document.getElementById('form-barcode').value = barcode;
+            
+            if (data.suggestedStorage) {
+                const storageOption = document.querySelector(`.storage-option[data-storage="${data.suggestedStorage}"]`);
+                if (storageOption) {
+                    storageOption.click();
+                }
+            }
+            
+            document.getElementById('product-preview').classList.add('active');
+            document.getElementById('product-preview').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.notification .delete').forEach(deleteButton => {
+                deleteButton.addEventListener('click', function() {
+                    this.parentElement.remove();
+                });
+            });
+            
+            document.getElementById('manual-barcode').focus();
+            
+            document.getElementById('manual-barcode').addEventListener('focus', function() {
+                this.select();
+            });
+        });
+        
+        window.addEventListener('beforeunload', function() {
+            if (isScanning) {
+                Quagga.stop();
+            }
+        });
+    </script>
+</body>
+</html>

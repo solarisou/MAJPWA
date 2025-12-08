@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Page non trouvée - ECO Cook</title>
+    <th:block th:replace="~{fragments/head :: common-styles}"></th:block>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- CONTENU ERREUR 404 -->
+    <section class="hero is-medium">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <h1 class="title is-1" style="font-size: 6rem; color: var(--eco-orange);">404</h1>
+                <h2 class="subtitle is-3">Page non trouvée</h2>
+                
+                <div class="buttons is-centered">
+                    <a th:href="@{/}" class="button is-primary is-medium">
+                        <span class="icon"><i class="fas fa-home"></i></span>
+                        <span>Retour à l'accueil</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>
+

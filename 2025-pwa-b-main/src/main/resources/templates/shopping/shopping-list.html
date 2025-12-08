@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Liste de courses - ECO Cook</title>
+    <th:block th:replace="~{fragments/head :: common-styles}"></th:block>
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/shopping-list.css}">
+    <!-- Token CSRF pour les requêtes AJAX -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- SHOPPING LIST SECTION -->
+    <section class="section">
+        <div class="container">
+            <!-- Messages -->
+            <div class="notification is-success is-light" th:if="${success}">
+                <button class="delete"></button>
+                <span th:text="${success}"></span>
+            </div>
+            <div class="notification is-danger is-light" th:if="${error}">
+                <button class="delete"></button>
+                <span th:text="${error}"></span>
+            </div>
+            
+            <!-- Formulaire d'ajout -->
+            <div class="add-form">
+                <form th:action="@{/shopping-list/add}" method="post">
+                    <div class="columns">
+                        <div class="column">
+                            <div class="control has-icons-left">
+                                <input class="input is-large" type="text" name="name" 
+                                       placeholder="Ex: Tomates, Lait, Pain..." required autofocus>
+                                <span class="icon is-left">
+                                    <i class="fas fa-shopping-basket"></i>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="column is-2">
+                            <div class="control">
+                                <input class="input is-large" type="number" name="quantity" 
+                                       min="1" placeholder="Qté">
+                            </div>
+                        </div>
+                        
+                        <div class="column is-2">
+                            <div class="control">
+                                <input class="input is-large" type="text" name="unit" 
+                                       placeholder="kg, L...">
+                            </div>
+                        </div>
+                        
+                        <div class="column is-narrow">
+                            <div class="control">
+                                <button type="submit" class="button is-primary is-large">
+                                    <span class="icon">
+                                        <i class="fas fa-plus"></i>
+                                    </span>
+                                    <span>Ajouter</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Papier de liste -->
+            <div class="paper-container">
+                <div class="paper-header">
+                    <h1 class="paper-title">Liste de Courses</h1>
+                    <p class="paper-subtitle">
+                        <span th:text="${#lists.size(selectedRecipeMatches)}">0</span> recettes sélectionnées
+                    </p>
+                </div>
+                
+                <div class="lined-paper">
+                    <!-- Liste vide -->
+                    <div th:if="${#lists.isEmpty(selectedRecipeMatches) and #lists.isEmpty(manualItems)}" class="empty-list">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>Liste vide</p>
+                        <p style="font-size: 1rem;">Sélectionnez des recettes ou ajoutez des articles manuellement</p>
+                    </div>
+                    
+                    <!-- Recettes sélectionnées -->
+                    <div th:each="match : ${selectedRecipeMatches}">
+                        <!-- Nom de la recette -->
+                        <div class="recipe-divider">
+                            <i class="fas fa-utensils"></i> 
+                            <span th:text="${match.recipe.name}">Recette</span>
+                        </div>
+                        
+                        <!-- Ingrédients à acheter (manquants) -->
+                        <div th:each="ingredient : ${match.missingIngredients}"
+                             class="shopping-list-item">
+                            <div class="check-symbol missing">☐</div>
+                            <div class="item-content">
+                                <span class="item-name" th:text="${ingredient.name}">Ingredient</span>
+                                <span class="item-quantity">
+                                    (<span th:text="${ingredient.quantity}">1</span>
+                                    <span th:if="${ingredient.unit != null}" th:text="' ' + ${ingredient.unit}">g</span>)
+                                </span>
+                                <span class="item-status status-missing"> → à acheter</span>
+                            </div>
+                            <div style="width: 30px;"></div>
+                        </div>
+                        
+                        <!-- Ingrédients du garde-manger (déjà disponibles) -->
+                        <div th:each="ingredient : ${match.matchedIngredients}"
+                             class="shopping-list-item" style="opacity: 0.6;">
+                            <div class="check-symbol available">✓</div>
+                            <div class="item-content">
+                                <span class="item-name" th:text="${ingredient.name}">Ingredient</span>
+                                <span class="item-quantity">
+                                    (réservé: <span th:text="${ingredient.quantity}">1</span>
+                                    <span th:if="${ingredient.unit != null}" th:text="' ' + ${ingredient.unit}">g</span>)
+                                </span>
+                                <span class="item-status status-available"> → dans le garde-manger</span>
+                            </div>
+                            <div style="width: 30px;"></div>
+                        </div>
+                        
+                        <!-- Ligne de séparation -->
+                        <div class="recipe-separator"></div>
+                    </div>
+                    
+                    <!-- Articles manuels -->
+                    <div th:if="${!#lists.isEmpty(manualItems)}">
+                        <div class="manual-divider">
+                            <i class="fas fa-plus-circle"></i> Articles manuels
+                        </div>
+                        
+                        <div th:each="item : ${manualItems}" 
+                             class="shopping-list-item"
+                             th:classappend="${item.checked} ? 'checked' : ''">
+                            
+                            <form th:action="@{/shopping-list/toggle}" method="post" style="display: inline;">
+                                <input type="hidden" name="id" th:value="${item.id}">
+                                <input type="checkbox" 
+                                       class="checkbox-custom" 
+                                       th:checked="${item.checked}">
+                            </form>
+                            
+                            <div class="item-content">
+                                <span class="item-name" th:text="${item.name}">Article</span>
+                                <span class="item-quantity" th:if="${item.quantity != null}">
+                                    (<span th:text="${item.quantity}">1</span><span th:if="${item.unit != null}" th:text="' ' + ${item.unit}">kg</span>)
+                                </span>
+                            </div>
+                            
+                            <form th:action="@{/shopping-list/delete}" method="post" style="display: inline;">
+                                <input type="hidden" name="id" th:value="${item.id}">
+                                <button type="button" class="delete-btn">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="paper-footer" th:if="${!#lists.isEmpty(manualItems)}">
+                    <form th:action="@{/shopping-list/clear-checked}" method="post" style="display: inline;">
+                        <button type="button" class="button is-light">
+                            <span class="icon">
+                                <i class="fas fa-broom"></i>
+                            </span>
+                            <span>Nettoyer les articles cochés</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>  
+    <!-- Script pour gérer la liste de courses sans recharger la page -->
+    <script th:src="@{/js/shopping-list.js}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.notification .delete').forEach(deleteButton => {
+                deleteButton.addEventListener('click', function() {
+                    this.parentElement.remove();
+                });
+            });
+            
+            setTimeout(() => {
+                document.querySelectorAll('.notification').forEach(notif => {
+                    notif.style.transition = 'opacity 0.5s';
+                    notif.style.opacity = '0';
+                    setTimeout(() => notif.remove(), 500);
+                });
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

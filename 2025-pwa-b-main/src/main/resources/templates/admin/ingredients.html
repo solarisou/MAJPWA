@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Gestion des ingrédients - ECO Cook</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/compte-admin.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: navbar}"></div>
+
+<section class="section">
+    <div class="container">
+        <div class="mb-5">
+            <h1 class="title is-3">Gestion des ingrédients</h1>
+            <p class="subtitle is-6 has-text-grey">Ajouter, modifier ou illustrer les ingrédients disponibles dans EcoCook.</p>
+        </div>
+
+        <div th:if="${success}" class="notification is-success is-light">
+            <button class="delete"></button>
+            <span th:text="${success}">Succès</span>
+        </div>
+        <div th:if="${error}" class="notification is-danger is-light">
+            <button class="delete"></button>
+            <span th:text="${error}">Erreur</span>
+        </div>
+        <div th:if="${availableIconsError}" class="notification is-warning is-light">
+            <button class="delete"></button>
+            <span th:text="${availableIconsError}">Erreur icônes</span>
+        </div>
+
+        <div class="box">
+            <h2 class="title is-4">Nouvel ingrédient</h2>
+            <form th:action="@{/admin/ingredients}" method="post" enctype="multipart/form-data" class="form-grid">
+                <div class="columns">
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Nom de l'ingrédient *</label>
+                            <div class="control">
+                                <input class="input" type="text" name="displayNameFr" placeholder="Ex : Boeuf haché" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Catégorie *</label>
+                            <div class="control">
+                                <input class="input" type="text" name="category" placeholder="Ex : Viandes" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Type de stockage *</label>
+                            <div class="control">
+                                <div class="select is-fullwidth">
+                                    <select name="defaultStorageType" required>
+                                        <option value="">-- Choisir --</option>
+                                        <option value="frigo">Frigo</option>
+                                        <option value="congelateur">Congélateur</option>
+                                        <option value="placard">Placard</option>
+                                        <option value="panier">Panier</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Conservation (jours) *</label>
+                            <div class="control">
+                                <input class="input" type="number" name="defaultShelfLife" min="1" placeholder="Ex : 7" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Unité par défaut *</label>
+                            <div class="control">
+                                <input class="input" type="text" name="defaultUnit" placeholder="Ex : g, L, unité" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="mt-4 mb-4">
+
+                <div class="columns">
+                    <div class="column is-narrow">
+                        <label class="label">Icône (optionnel)</label>
+                        <img src="/images/logoPannier.svg" class="preview-image" id="new-icon-preview" alt="Aperçu">
+                    </div>
+                    <div class="column is-narrow">
+                        <label class="label">&nbsp;</label>
+                        <div class="file">
+                            <label class="file-label">
+                                <input class="file-input" type="file" name="iconFile" accept=".svg,.png,.jpg,.jpeg,.webp"
+                                       onchange="previewUploadedIcon(this, 'new-icon-preview', 'iconChoice')">
+                                <span class="file-cta">
+                                    <span class="file-icon"><i class="fas fa-upload"></i></span>
+                                    <span class="file-label">Téléverser une icône</span>
+                                </span>
+                            </label>
+                        </div>
+                        <p class="help mt-1">SVG, PNG, JPG, WEBP</p>
+                    </div>
+                </div>
+                <input type="hidden" name="iconChoice" id="iconChoice">
+
+                <div class="field">
+                    <div class="control">
+                        <button type="submit" class="button is-primary is-fullwidth">
+                            <span class="icon"><i class="fas fa-plus"></i></span>
+                            <span>Ajouter l'ingrédient</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <h2 class="title is-4 mt-5">Ingrédients existants</h2>
+
+        <div th:if="${ingredients.isEmpty()}" class="notification is-info is-light">
+            Aucun ingrédient n'a encore été ajouté.
+        </div>
+
+        <div class="ingredients-grid" th:if="${!ingredients.isEmpty()}">
+            <div class="ingredient-card" th:each="ingredient : ${ingredients}"
+                 th:id="${'ingredient-card-' + ingredient.id}">
+                <header>
+                    <img th:if="${ingredient.iconPath != null}" th:src="@{${ingredient.iconPath}}" alt="Icône">
+                    <div>
+                        <p class="title is-5" th:text="${ingredient.displayNameFr}">Nom FR</p>
+                        <p class="subtitle is-7 has-text-grey" th:text="${ingredient.name}">nom-technique</p>
+                    </div>
+                </header>
+
+                <div class="content">
+                    <p><strong>Catégorie :</strong> <span th:text="${ingredient.category}">Catégorie</span></p>
+                    <p>
+                        <strong>Stockage :</strong>
+                        <span th:text="${ingredient.defaultStorageType}">placard</span>
+                        <span th:if="${ingredient.defaultShelfLife != null && ingredient.defaultShelfLife > 0}">
+                            • <strong>Conservation :</strong> <span th:text="${ingredient.defaultShelfLife}">7</span> jours
+                        </span>
+                    </p>
+                    <p th:if="${ingredient.defaultUnit != null}">
+                        <strong>Unité :</strong> <span th:text="${ingredient.defaultUnit}">g</span>
+                    </p>
+                </div>
+
+                <div class="ingredient-actions">
+                    <button type="button" class="toggle-edit-btn" th:attr="data-target=${'edit-form-' + ingredient.id}"
+                            onclick="toggleEditForm(this)">Modifier</button>
+                    <form th:action="@{/admin/ingredients/{id}/delete(id=${ingredient.id})}" method="post"
+                          onsubmit="return confirm('Supprimer cet ingrédient ?');">
+                        <button type="submit" class="button is-danger is-light is-small">
+                            <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                            <span>Supprimer</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="edit-form" th:id="${'edit-form-' + ingredient.id}">
+                    <form th:action="@{/admin/ingredients/{id}/update(id=${ingredient.id})}" method="post" enctype="multipart/form-data">
+                        <div class="columns">
+                            <div class="column">
+                                <div class="field">
+                                    <label class="label">Nom *</label>
+                                    <input class="input" type="text" name="displayNameFr" th:value="${ingredient.displayNameFr}" required>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="field">
+                                    <label class="label">Catégorie *</label>
+                                    <input class="input" type="text" name="category" th:value="${ingredient.category}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="columns">
+                            <div class="column">
+                                <div class="field">
+                                    <label class="label">Stockage *</label>
+                                    <div class="select is-fullwidth">
+                                        <select name="defaultStorageType" required>
+                                            <option value="frigo" th:selected="${ingredient.defaultStorageType == 'frigo'}">Frigo</option>
+                                            <option value="congelateur" th:selected="${ingredient.defaultStorageType == 'congelateur'}">Congélateur</option>
+                                            <option value="placard" th:selected="${ingredient.defaultStorageType == 'placard'}">Placard</option>
+                                            <option value="panier" th:selected="${ingredient.defaultStorageType == 'panier'}">Panier</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="field">
+                                    <label class="label">Conservation (j) *</label>
+                                    <input class="input" type="number" name="defaultShelfLife" min="1" th:value="${ingredient.defaultShelfLife}" required>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <div class="field">
+                                    <label class="label">Unité *</label>
+                                    <input class="input" type="text" name="defaultUnit" th:value="${ingredient.defaultUnit}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-3">
+
+                        <div class="columns">
+                            <div class="column is-narrow">
+                                <label class="label">Icône</label>
+                                <img th:if="${ingredient.iconPath != null}" th:src="@{${ingredient.iconPath}}"
+                                     class="preview-image" th:id="${'edit-preview-' + ingredient.id}" alt="Icône">
+                                <img th:if="${ingredient.iconPath == null}" src="/images/logoPannier.svg"
+                                     class="preview-image" th:id="${'edit-preview-' + ingredient.id}" alt="Icône">
+                            </div>
+                            <div class="column is-narrow">
+                                <label class="label">&nbsp;</label>
+                                <div class="file">
+                                    <label class="file-label">
+                                        <input class="file-input" type="file" name="iconFile" accept=".svg,.png,.jpg,.jpeg,.webp"
+                                               th:onchange="'previewUploadedIcon(this, \'' + 'edit-preview-' + ingredient.id + '\', \'' + 'icon-choice-' + ingredient.id + '\')'">
+                                        <span class="file-cta">
+                                            <span class="file-icon"><i class="fas fa-upload"></i></span>
+                                            <span class="file-label">Modifier l'icône</span>
+                                        </span>
+                                    </label>
+                                </div>
+                                <p class="help mt-1">SVG, PNG, JPG, WEBP</p>
+                            </div>
+                        </div>
+                        <input type="hidden" name="iconChoice" th:id="${'icon-choice-' + ingredient.id}" th:value="${ingredient.iconPath}">
+
+                        <div class="buttons mt-3">
+                            <button type="submit" class="button is-success">
+                                <span class="icon"><i class="fas fa-save"></i></span>
+                                <span>Sauvegarder</span>
+                            </button>
+                            <button type="button" class="button is-light"
+                                    th:attr="data-target=${'edit-form-' + ingredient.id}"
+                                    onclick="toggleEditForm(this)">
+                                Annuler
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+<div th:replace="~{fragments/header :: navbar-scripts}"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.notification .delete').forEach(button => {
+            button.addEventListener('click', () => button.closest('.notification').remove());
+        });
+        initializeIconGalleries();
+    });
+
+    function initializeIconGalleries() {
+        document.querySelectorAll('.icon-gallery').forEach(gallery => {
+            gallery.querySelectorAll('.icon-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    gallery.querySelectorAll('.icon-option').forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                });
+            });
+        });
+    }
+
+    function selectIcon(element, inputId, previewId) {
+        const path = element.dataset.path;
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        if (input) {
+            input.value = path;
+        }
+        if (preview) {
+            preview.src = path;
+            preview.style.background = '#f0fdf4';
+        }
+        const siblings = element.parentElement.querySelectorAll('.icon-option');
+        siblings.forEach(opt => opt.classList.remove('selected'));
+        element.classList.add('selected');
+    }
+
+    function previewUploadedIcon(input, previewId, iconChoiceId) {
+        const file = input.files[0];
+        const preview = document.getElementById(previewId);
+        const iconChoice = document.getElementById(iconChoiceId);
+        const fileNameSpan = input.closest('.file').querySelector('.file-name');
+
+        if (fileNameSpan) {
+            fileNameSpan.textContent = file ? file.name : 'Aucun fichier choisi';
+        }
+
+        if (!file) {
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (preview) {
+                preview.src = e.target.result;
+                preview.style.background = '#f0fdf4';
+            }
+            if (iconChoice) {
+                iconChoice.value = '';
+            }
+        };
+        reader.readAsDataURL(file);
+
+        const gallery = input.closest('.ingredient-card, .box')?.querySelector('.icon-gallery');
+        if (gallery) {
+            gallery.querySelectorAll('.icon-option').forEach(opt => opt.classList.remove('selected'));
+        }
+    }
+
+    function toggleEditForm(button) {
+        const targetId = button.getAttribute('data-target');
+        const target = document.getElementById(targetId);
+        if (target) {
+            target.classList.toggle('active');
+        }
+    }
+</script>
+</body>
+</html>
+

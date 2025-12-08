@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Détails du signalement - ECO Cook</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/recipes.css}">
+    <link rel="stylesheet" th:href="@{/css/compte-admin.css}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- REPORT DETAIL -->
+    <section class="section">
+        <div class="container">
+            <div class="level">
+                <div class="level-left">
+                    <h1 class="title is-2">Détails du signalement</h1>
+                </div>
+                <div class="level-right">
+                    <a th:href="@{/admin/recipes/reported}" class="button">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Retour</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            <div th:if="${success}" class="notification is-success is-light">
+                <button class="delete" onclick="this.parentElement.remove()"></button>
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="notification is-danger is-light">
+                <button class="delete" onclick="this.parentElement.remove()"></button>
+                <span th:text="${error}"></span>
+            </div>
+            
+            <div th:if="${report}" class="box" style="margin-top: 2rem;">
+                <h2 class="title is-4">Information du signalement</h2>
+                <div class="content">
+                    <p><strong>Signalé par :</strong> <span th:text="${report.reportedBy}">Utilisateur</span></p>
+                    <p><strong>Date du signalement :</strong> <span th:text="${#temporals.format(report.createdAt, 'dd/MM/yyyy HH:mm')}">Date</span></p>
+                    <p><strong>Statut :</strong> 
+                        <span class="tag" 
+                              th:classappend="${report.status.name() == 'PENDING'} ? 'is-warning' : (${report.status.name() == 'RESOLVED'} ? 'is-success' : 'is-info')"
+                              th:text="${report.status.name()}">PENDING</span>
+                    </p>
+                    <div class="notification is-warning is-light" style="margin-top: 1rem;">
+                        <p><strong>Raison du signalement :</strong></p>
+                        <p th:text="${report.reportReason ?: 'Aucune raison spécifiée'}">Raison</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${recipe}" class="box" style="margin-top: 2rem;">
+                <h2 class="title is-4">Détails de la recette signalée</h2>
+                <div class="content">
+                    <p><strong>Nom :</strong> <span th:text="${recipe.name}">Nom</span></p>
+                    <p><strong>Description :</strong> <span th:text="${recipe.description}">Description</span></p>
+                    <p><strong>Catégorie :</strong> <span th:text="${recipe.category}">Catégorie</span></p>
+                    <p><strong>Difficulté :</strong> <span th:text="${recipe.difficulty}">Difficulté</span></p>
+                    <p><strong>Temps de préparation :</strong> <span th:text="${recipe.preparationTime} + ' min'">Temps</span></p>
+                    <p><strong>Temps de cuisson :</strong> <span th:text="${recipe.cookingTime} + ' min'">Temps</span></p>
+                    <p><strong>Nombre de portions :</strong> <span th:text="${recipe.servings}">Portions</span></p>
+                    <p><strong>Créée par :</strong> <span th:text="${recipe.createdBy ?: 'Inconnu'}">Créateur</span></p>
+                    <p style="margin-top: 1rem;">
+                        <a th:href="@{/recipes/{id}(id=${recipe.id})}" class="button is-info" target="_blank">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span>Voir la recette complète</span>
+                        </a>
+                    </p>
+                </div>
+            </div>
+            
+            <div th:if="${report.status.name() == 'PENDING'}" class="box" style="margin-top: 2rem;">
+                <h2 class="title is-4">Actions</h2>
+                <div class="buttons">
+                    <form th:action="@{/admin/recipes/reports/{id}/delete-recipe(id=${report.id})}" 
+                          method="post" 
+                          style="display: inline;"
+                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette recette ? Cette action est irréversible.');">
+                        <button type="submit" class="button is-danger">
+                            <i class="fas fa-trash"></i>
+                            <span>Supprimer la recette</span>
+                        </button>
+                    </form>
+                    <form th:action="@{/admin/recipes/reports/{id}/dismiss(id=${report.id})}" 
+                          method="post" 
+                          style="display: inline;">
+                        <button type="submit" class="button is-success">
+                            <i class="fas fa-check"></i>
+                            <span>Rejeter le signalement</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div th:if="${report.status.name() != 'PENDING'}" class="box" style="margin-top: 2rem;">
+                <h2 class="title is-4">Historique</h2>
+                <div class="content">
+                    <p><strong>Traité par :</strong> <span th:text="${report.reviewedBy ?: 'N/A'}">Admin</span></p>
+                    <p><strong>Date du traitement :</strong> 
+                        <span th:if="${report.reviewedAt}" th:text="${#temporals.format(report.reviewedAt, 'dd/MM/yyyy HH:mm')}">Date</span>
+                        <span th:unless="${report.reviewedAt}">N/A</span>
+                    </p>
+                    <p th:if="${report.reviewNote}"><strong>Note :</strong> <span th:text="${report.reviewNote}">Note</span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>
+</body>
+</html>
+

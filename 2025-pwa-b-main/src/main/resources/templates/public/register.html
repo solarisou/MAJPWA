@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - ECO Cook</title>
+   
+     <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS personnalisé -->
+    <link rel="stylesheet" th:href="@{/css/login.css}">
+</head>
+
+<body>
+    <section class="hero is-fullheight">
+        <div class="hero-body">
+            <div class="container">
+                <div class="columns is-centered">
+                    <div class="column is-5-tablet is-4-desktop">
+                        <div class="box">
+                            
+                            <!-- Logo -->
+                            <div class="logo-section">
+                                <div class="logo-container">
+                                    <img th:src="@{/images/EcoCookempiler.svg}" alt="ECO Cook Logo">
+                                </div>
+                                <h1 class="title-main">Inscription</h1>
+                                <p class="subtitle-text">Créez votre compte ECO Cook</p>
+                            </div>
+
+                            <!-- Formulaire d’inscription -->
+                            <form th:action="@{/register}" method="post" th:object="${form}">
+                                
+                                <!-- Email -->
+                                <div class="field">
+                                    <label class="label">
+                                        <i class="fas fa-envelope"></i>
+                                        Email
+                                    </label>
+                                    <div class="control">
+                                        <input class="input" type="email" th:field="*{userName}" 
+                                               placeholder="email@exemple.com" required
+                                               th:classappend="${#fields.hasErrors('userName')} ? 'is-danger' : ''">
+                                    </div>
+                                    <p class="help is-danger" th:if="${#fields.hasErrors('userName')}" 
+                                       th:errors="*{userName}"></p>
+                                </div>
+
+                                <!-- Nom -->
+                                <div class="field">
+                                    <label class="label">
+                                        <i class="fas fa-user"></i>
+                                        Nom
+                                    </label>
+                                    <div class="control">
+                                        <input class="input" type="text" th:field="*{displayName}" 
+                                               placeholder="Votre nom" required
+                                               th:classappend="${#fields.hasErrors('displayName')} ? 'is-danger' : ''">
+                                    </div>
+                                    <p class="help is-danger" th:if="${#fields.hasErrors('displayName')}" 
+                                       th:errors="*{displayName}"></p>
+                                </div>
+
+                                <!-- Mot de passe -->
+                                <div class="field">
+                                    <label class="label">
+                                        <i class="fas fa-lock"></i>
+                                        Mot de passe
+                                    </label>
+                                    <div class="control">
+                                        <input class="input" type="password" th:field="*{password}" 
+                                               id="password" placeholder="••••••••" required
+                                               th:classappend="${#fields.hasErrors('password')} ? 'is-danger' : ''">
+                                        <button type="button" 
+                                                class="password-toggle" 
+                                                onclick="togglePassword('password','toggleIcon1')"
+                                                aria-label="Afficher/masquer le mot de passe">
+                                            <i class="fas fa-eye" id="toggleIcon1"></i>
+                                        </button>
+                                    </div>
+                                    <p class="help is-danger" th:if="${#fields.hasErrors('password')}" 
+                                       th:errors="*{password}"></p>
+                                </div>
+
+                                <!-- Confirmation -->
+                                <div class="field">
+                                    <label class="label">
+                                        <i class="fas fa-lock"></i>
+                                        Confirmer le mot de passe
+                                    </label>
+                                    <div class="control">
+                                        <input class="input" type="password" th:field="*{confirmPassword}" 
+                                               id="confirmPassword" placeholder="••••••••" required
+                                               th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-danger' : ''">
+                                        <button type="button" 
+                                                class="password-toggle" 
+                                                onclick="togglePassword('confirmPassword','toggleIcon2')"
+                                                aria-label="Afficher/masquer le mot de passe">
+                                            <i class="fas fa-eye" id="toggleIcon2"></i>
+                                        </button>
+                                    </div>
+                                    <p class="help is-danger" th:if="${#fields.hasErrors('confirmPassword')}" 
+                                       th:errors="*{confirmPassword}"></p>
+                                </div>
+
+                                <!-- Bouton d’envoi -->
+                                <div class="field" style="margin-top: 2rem;">
+                                    <button class="button is-primary is-fullwidth" type="submit">
+                                        <span>S'inscrire</span>
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Divider -->
+                            <div class="divider-container">
+                                <div class="divider-line"></div>
+                                <span class="divider-text">ou</span>
+                                <div class="divider-line"></div>
+                            </div>
+
+                            <!-- Liens bas de page -->
+                            <div class="footer-links">
+                                <p>
+                                    Déjà un compte ? 
+                                    <a th:href="@{/login}">Se connecter</a>
+                                </p>
+                                <a th:href="@{/}" class="back-link">
+                                    <i class="fas fa-arrow-left"></i>
+                                    <span>Retour à l'accueil</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript -->
+    <script th:src="@{/js/login.js}"></script>
+    <script th:src="@{/js/register-validation.js}"></script>
+</body>
+</html>

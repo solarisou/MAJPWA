@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <!-- Fragment FOOTER -->
+    <footer class="footer" th:fragment="footer">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-4">
+                    <div class="footer-brand">
+                        <img th:src="@{/images/EcoCookaligner.svg}" alt="ECO Cook Logo">
+                    </div>
+                    <p class="footer-description">
+                        Votre assistant intelligent pour réduire le gaspillage alimentaire et économiser au quotidien.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="Facebook">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="social-link" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="column is-2">
+                    <h4 class="footer-title">Navigation</h4>
+                    <ul class="footer-links">
+                        <li><a th:href="@{/}">Accueil</a></li>
+                        <li><a th:href="@{/recipes}">Recettes</a></li>
+                        <li><a th:href="@{/scanner}">Scanner</a></li>
+                        <li><a th:href="@{/pantry}" sec:authorize="isAuthenticated()">Garde-manger</a></li>
+                    </ul>
+                </div>
+                
+                <div class="column is-3">
+                    <h4 class="footer-title">Compte</h4>
+                    <ul class="footer-links">
+                        <li sec:authorize="!isAuthenticated()"><a th:href="@{/register}">S'inscrire</a></li>
+                        <li sec:authorize="!isAuthenticated()"><a th:href="@{/login}">Connexion</a></li>
+                        <li sec:authorize="isAuthenticated()"><a th:href="@{/profile}">Mon profil</a></li>
+                    </ul>
+                </div>
+                
+                <div class="column is-3">
+                    <h4 class="footer-title">Contact</h4>
+                    <p class="footer-description">
+                        <i class="fas fa-envelope"></i> contact@ecocook.fr<br>
+                        <i class="fas fa-phone"></i> 07 50 54 16 78
+                    </p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>© 2025 ECO Cook. Tous droits réservés.</p>
+                <p class="footer-credits">Projet étudiant - Université de Corse</p>
+            </div>
+        </div>
+    </footer>
+    
+       <!-- Script pour le burger menu -->
+    <script th:fragment="burger-script">
+        document.addEventListener('DOMContentLoaded', () => {
+            const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+            $navbarBurgers.forEach( el => {
+                el.addEventListener('click', () => {
+                    const target = el.dataset.target;
+                    const $target = document.getElementById(target);
+                    el.classList.toggle('is-active');
+                    $target.classList.toggle('is-active');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

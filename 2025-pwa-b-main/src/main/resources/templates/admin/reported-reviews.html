@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Avis signalés - ECO Cook</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/recipes.css}">
+    <link rel="stylesheet" th:href="@{/css/compte-admin.css}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- REPORTED REVIEWS -->
+    <section class="section">
+        <div class="container">
+            <div class="level">
+                <div class="level-left">
+                    <h1 class="title is-2">Avis signalés</h1>
+                </div>
+                <div class="level-right">
+                    <a th:href="@{/admin}" class="button">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Retour</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            <div th:if="${success}" class="notification is-success is-light">
+                <button class="delete" onclick="this.parentElement.remove()"></button>
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="notification is-danger is-light">
+                <button class="delete" onclick="this.parentElement.remove()"></button>
+                <span th:text="${error}"></span>
+            </div>
+            
+            <!-- Reviews List -->
+            <div th:if="${!#lists.isEmpty(reviews)}" class="box" style="margin-top: 2rem;">
+                <div th:each="review : ${reviews}" class="box" style="margin-bottom: 1rem;">
+                    <div class="level">
+                        <div class="level-left">
+                            <div>
+                                <p class="title is-5">
+                                    <a th:href="@{/recipes/{id}(id=${review.recipe.id})}" th:text="${review.recipe.name}">Recette</a>
+                                </p>
+                                <p class="subtitle is-6">
+                                    Par <span th:text="${review.userName}">Utilisateur</span> 
+                                    le <span th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy HH:mm')}">Date</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="level-right">
+                            <div class="tags has-addons">
+                                <span class="tag is-warning" th:text="'Note: ' + ${review.rating} + '/5'">Note</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${review.comment}" class="content" style="margin-top: 1rem;">
+                        <p th:text="${review.comment}">Commentaire</p>
+                    </div>
+                    
+                    <div th:if="${!#lists.isEmpty(review.photos)}" class="columns" style="margin-top: 1rem;">
+                        <div th:each="photo : ${review.photos}" class="column is-3">
+                            <figure class="image">
+                                <img th:src="@{${photo.photoPath}}" alt="Photo de l'avis">
+                            </figure>
+                        </div>
+                    </div>
+                    
+                    <div class="notification is-warning is-light" style="margin-top: 1rem;">
+                        <p><strong>Raison du signalement :</strong></p>
+                        <p th:text="${review.reportReason}">Raison</p>
+                        <p><strong>Signalé par :</strong> <span th:text="${review.reportedBy}">Utilisateur</span></p>
+                    </div>
+                    
+                    <div class="buttons" style="margin-top: 1rem;">
+                        <form th:action="@{/admin/reviews/{id}/approve(id=${review.id})}" method="post" style="display: inline;">
+                            <button type="submit" class="button is-success">
+                                <i class="fas fa-check"></i>
+                                <span>Approuver</span>
+                            </button>
+                        </form>
+                        <form th:action="@{/admin/reviews/{id}/delete(id=${review.id})}" 
+                              method="post" 
+                              style="display: inline;"
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet avis ?');">
+                            <button type="submit" class="button is-danger">
+                                <i class="fas fa-trash"></i>
+                                <span>Supprimer</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(reviews)}" class="box has-text-centered" style="margin-top: 2rem;">
+                <p class="title is-4">Aucun avis signalé</p>
+                <p class="subtitle is-6">Tous les avis sont en ordre !</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>
+</body>
+</html>
+
+

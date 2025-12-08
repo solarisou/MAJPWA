@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <!-- Fragment NAVBAR -->
+    <nav class="navbar" th:fragment="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <a class="navbar-item logo-link" th:href="@{/}">
+                    <img th:src="@{/images/EcoCookaligner.svg}" alt="ECO Cook Logo" class="navbar-logo">
+                    
+                </a>
+
+                
+                <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarMenu">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </a>
+            </div>
+            
+            <div id="navbarMenu" class="navbar-menu">
+                <div class="navbar-start">
+                    <a class="navbar-item nav-link" th:href="@{/}">
+                        <i class="fas fa-home"></i>
+                        <span>Accueil</span>
+                    </a>
+                    
+                    <a class="navbar-item nav-link" th:href="@{/recipes}">
+                        <i class="fas fa-utensils"></i>
+                        <span>Recettes</span>
+                    </a>
+                    
+                    <a class="navbar-item nav-link" th:href="@{/scanner}">
+                        <i class="fas fa-qrcode"></i>
+                        <span>Scanner</span>
+                    </a>
+                    
+                    <a class="navbar-item nav-link" th:href="@{/pantry}" sec:authorize="isAuthenticated()">
+                        <i class="fas fa-box"></i>
+                        <span>Garde-manger</span>
+                    </a>
+                    
+                    <a class="navbar-item nav-link" th:href="@{/shopping-list}" sec:authorize="isAuthenticated()">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Courses</span>
+                    </a>
+                    
+                    <a class="navbar-item nav-link" th:href="@{/admin}" sec:authorize="hasRole('ADMIN')">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Administration</span>
+                    </a>
+                </div>
+                
+                <div class="navbar-end">
+                    <div class="navbar-item">
+                        <div class="buttons">
+                            <!-- Si NON connecté -->
+                            <div class="auth-buttons" sec:authorize="!isAuthenticated()">
+                                <a class="button btn-login" th:href="@{/login}">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    <span>Connexion</span>
+                                </a>
+                                <a class="button btn-signup" th:href="@{/register}">
+                                    <i class="fas fa-rocket"></i>
+                                    <span>Commencer</span>
+                                </a>
+                            </div>
+                            
+                            <!-- Si connecté -->
+                            <div class="auth-buttons" sec:authorize="isAuthenticated()">
+                                <div class="dropdown is-hoverable user-dropdown">
+                                    <div class="dropdown-trigger">
+                                        <button class="button btn-user" aria-haspopup="true" aria-controls="dropdown-menu">
+                                            <span class="user-avatar">
+                                                <i class="fas fa-user-circle"></i>
+                                            </span>
+                                            <span class="user-name" sec:authentication="principal.username"></span>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                    <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                                        <div class="dropdown-content">
+                                            <a th:href="@{/profile}" class="dropdown-item">
+                                                <i class="fas fa-user"></i>
+                                                Mon profil
+                                            </a>
+                                            <a th:href="@{/pantry}" class="dropdown-item notification-badge">
+                                                <i class="fas fa-box"></i>
+                                                Garde-manger
+                                            </a>
+                                            <a th:href="@{/shopping-list}" class="dropdown-item">
+                                                <i class="fas fa-shopping-cart"></i>
+                                                Liste de courses
+                                            </a>
+                                            <a th:href="@{/admin}" class="dropdown-item" sec:authorize="hasRole('ADMIN')">
+                                                <i class="fas fa-shield-alt"></i>
+                                                Administration
+                                            </a>
+                                            <hr class="dropdown-divider">
+                                            <a class="dropdown-item" onclick="document.getElementById('logoutForm').submit();">
+                                                <i class="fas fa-sign-out-alt"></i>
+                                                Déconnexion
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <form id="logoutForm" th:action="@{/logout}" method="post" style="display: none;">
+                                    <button type="submit"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+     <!-- Script burger menu -->
+    <th:block th:fragment="navbar-scripts">
+        <script th:src="@{/js/menu.js}"></script>
+    </th:block>
+</body>
+</html>

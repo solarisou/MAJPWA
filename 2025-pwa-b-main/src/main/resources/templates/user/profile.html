@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Mon Profil - ECO Cook</title>
+    <th:block th:replace="~{fragments/head :: common-styles}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- PROFILE SECTION -->
+    <section class="section">
+        <div class="container">
+            
+            <!-- En-tête profil -->
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h1 class="profile-name" sec:authentication="principal.username"></h1>
+                <p class="profile-email">
+                    Membre depuis <span th:text="${#temporals.format(#temporals.createNow(), 'MMMM yyyy')}">novembre 2025</span>
+                </p>
+            </div>
+            
+            <!-- Statistiques -->
+            <div class="stats-grid">
+                <div class="stat-card orange">
+                    <div class="stat-icon">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                    <div class="stat-number" th:text="${productsCount != null ? productsCount : 0}">0</div>
+                    <div class="stat-label">Produits en stock</div>
+                </div>
+                
+                <div class="stat-card green">
+                    <div class="stat-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="stat-number" th:text="${recipesCount != null ? recipesCount : 0}">0</div>
+                    <div class="stat-label">Recettes créées</div>
+                </div>
+                
+                <div class="stat-card blue">
+                    <div class="stat-icon">
+                        <i class="fas fa-shopping-basket"></i>
+                    </div>
+                    <div class="stat-number" th:text="${shoppingListCount != null ? shoppingListCount : 0}">0</div>
+                    <div class="stat-label">Liste de courses</div>
+                </div>
+            </div>
+            
+            <!-- Informations du compte -->
+            <div class="columns">
+                <div class="column is-half">
+                    <div class="info-section">
+                        <h2 class="title is-4">
+                            <span class="icon has-text-primary">
+                                <i class="fas fa-user-circle"></i>
+                            </span>
+                            Informations du compte
+                        </h2>
+                        
+                        <div class="content">
+                            <table class="table is-fullwidth">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Email :</strong></td>
+                                        <td sec:authentication="principal.username"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Nom d'affichage :</strong></td>
+                                        <td sec:authentication="principal.username"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Rôle :</strong></td>
+                                        <td>
+                                            <span th:if="${user != null}">
+                                                <!-- Afficher seulement ADMIN si présent, sinon afficher les autres rôles -->
+                                                <span th:if="${isAdmin}" class="tag is-danger">
+                                                    Admin
+                                                </span>
+                                                <span th:unless="${isAdmin}"
+                                                      th:each="role : ${user.roles}" 
+                                                      class="tag"
+                                                      th:classappend="${role.name() == 'MODERATEUR'} ? 'is-warning' : 'is-success'"
+                                                      style="margin-right: 0.5rem;">
+                                                    <span th:text="${role.name()}">ROLE</span>
+                                                </span>
+                                            </span>
+                                            <span th:if="${user == null}" class="tag is-success">Utilisateur</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="column is-half">
+                    <div class="info-section">
+                        <h2 class="title is-4">
+                            <span class="icon has-text-success">
+                                <i class="fas fa-leaf"></i>
+                            </span>
+                            Impact écologique
+                        </h2>
+                        
+                        <div class="content">
+                            <div class="notification is-success is-light">
+                                <p class="has-text-weight-bold">Vous contribuez à réduire le gaspillage alimentaire !</p>
+                                <p class="mt-2">
+                                    En utilisant ECO Cook, vous faites un geste pour la planète en optimisant 
+                                    la gestion de vos aliments et en évitant le gaspillage.
+                                </p>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <p><i class="fas fa-recycle has-text-success"></i> Suivi des dates de péremption</p>
+                                <p><i class="fas fa-utensils has-text-success"></i> Recettes anti-gaspillage</p>
+                                <p><i class="fas fa-leaf has-text-success"></i> Optimisation des courses</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modifier mot de passe -->
+            <div class="columns mt-5">
+                <div class="column is-half is-offset-one-quarter">
+                    <div class="info-section">
+                        <h2 class="title is-4">
+                            <span class="icon has-text-warning">
+                                <i class="fas fa-key"></i>
+                            </span>
+                            Modifier le mot de passe
+                        </h2>
+                        
+                        <form th:action="@{/profile/change-password}" method="post">
+                            <div class="field">
+                                <label class="label">Mot de passe actuel</label>
+                                <div class="control has-icons-left">
+                                    <input class="input" type="password" name="currentPassword" 
+                                           placeholder="Votre mot de passe actuel" required>
+                                    <span class="icon is-left">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="field">
+                                <label class="label">Nouveau mot de passe</label>
+                                <div class="control has-icons-left">
+                                    <input class="input" type="password" name="newPassword" 
+                                           placeholder="Nouveau mot de passe" required minlength="6">
+                                    <span class="icon is-left">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                </div>
+                                <p class="help">Minimum 6 caractères</p>
+                            </div>
+                            
+                            <div class="field">
+                                <label class="label">Confirmer le mot de passe</label>
+                                <div class="control has-icons-left">
+                                    <input class="input" type="password" name="confirmPassword" 
+                                           placeholder="Confirmez le nouveau mot de passe" required minlength="6">
+                                    <span class="icon is-left">
+                                        <i class="fas fa-lock"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="field">
+                                <div class="control">
+                                    <button type="submit" class="button is-warning is-fullwidth">
+                                        <span class="icon">
+                                            <i class="fas fa-check"></i>
+                                        </span>
+                                        <span>Modifier le mot de passe</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Déconnexion -->
+            <div class="has-text-centered mt-5">
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="button is-danger is-light">
+                        <span class="icon">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </span>
+                        <span>Se déconnecter</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+     <div th:replace="~{fragments/header :: navbar-scripts}"></div>  
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.notification .delete').forEach(deleteButton => {
+                deleteButton.addEventListener('click', function() {
+                    this.parentElement.remove();
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

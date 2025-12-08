@@ -1,0 +1,170 @@
+<div th:fragment="replyThread(reply, currentUser, isAdminUser, reviewOwner, canReplyToReviews, reviewId, reviewUserName, reviewComment)" class="reply-thread">
+    <article class="media review-reply"
+             th:attr="id=${'reply-' + reply.id}"
+             style="padding: 1rem; border-left: 3px solid var(--border-color); background: var(--bg-white); margin-bottom: 1rem; border-radius: 8px;">
+        <div class="media-content">
+            <p class="title is-6" style="margin-bottom: 0.25rem;">
+                <span th:text="${reply.userName}">Répondant</span>
+                <span class="tag is-light" th:if="${reply.userName == reviewOwner}">Auteur</span>
+            </p>
+            <p class="subtitle is-7 has-text-grey" style="margin-bottom: 0.75rem;">
+                <span th:text="${#temporals.format(reply.createdAt, 'dd/MM/yyyy HH:mm')}">Date</span>
+            </p>
+
+            <div class="reply-reference"
+                 th:with="targetHref=${reply.parent != null ? '#reply-' + reply.parent.id : '#review-' + reviewId},
+                          targetAuthor=${reply.parent != null ? reply.parent.userName : reviewUserName},
+                          rawText=${reply.parent != null ? reply.parent.comment : reviewComment},
+                          previewText=${#strings.isEmpty(rawText) ? 'Pas de contenu texte' : #strings.abbreviate(rawText, 140)}">
+                <a class="reply-reference-link" th:href="${targetHref}">
+                    <span class="reference-label">
+                        <i class="fas fa-reply"></i>
+                        <span th:text="${'En réponse à ' + targetAuthor}">En réponse à Auteur</span>
+                    </span>
+                    <span class="reference-preview" th:text="${previewText}">Extrait du message parent</span>
+                </a>
+            </div>
+
+            <div th:if="${reply.reported}" class="notification is-warning is-light" style="margin-bottom: 0.75rem;">
+                <i class="fas fa-flag"></i>
+                Cette réponse a été signalée et est en cours de vérification.
+            </div>
+
+            <div class="content">
+                <p th:text="${reply.comment}">Réponse</p>
+            </div>
+
+            <div class="reply-actions buttons" sec:authorize="isAuthenticated()" style="margin-top: 0.75rem;">
+                <button type="button"
+                        class="button is-info is-small is-light"
+                        th:if="${currentUser != null and (reply.userName == currentUser || isAdminUser)}"
+                        th:attr="data-reply-id=${reply.id}"
+                        onclick="toggleReplyEditForm(this.getAttribute('data-reply-id'))">
+                    <i class="fas fa-edit"></i>
+                    <span>Modifier</span>
+                </button>
+
+                <form th:action="@{/recipes/reviews/replies/{id}/delete(id=${reply.id})}"
+                      method="post"
+                      style="display: inline;"
+                      th:if="${currentUser != null and (reply.userName == currentUser || isAdminUser)}"
+                      onsubmit="return confirm('Supprimer cette réponse ?');">
+                    <button type="submit" class="button is-danger is-small is-light">
+                        <i class="fas fa-trash"></i>
+                        <span>Supprimer</span>
+                    </button>
+                </form>
+
+                <form th:action="@{/recipes/reviews/replies/{id}/report(id=${reply.id})}"
+                      method="post"
+                      style="display: inline;"
+                      th:if="${currentUser != null and reply.userName != currentUser}">
+                    <button type="submit" class="button is-warning is-small is-light">
+                        <i class="fas fa-flag"></i>
+                        <span>Signaler</span>
+                    </button>
+                </form>
+
+                <button type="button"
+                        class="button is-primary is-small is-light"
+                        th:if="${currentUser != null and canReplyToReviews and userHasChildReply[reply.id] != true}"
+                        th:attr="data-reply-id=${reply.id}"
+                        onclick="toggleNestedReplyForm(this.getAttribute('data-reply-id'))">
+                    <i class="fas fa-reply"></i>
+                    <span>Répondre</span>
+                </button>
+            </div>
+            <div class="reply-limit-info"
+                 sec:authorize="isAuthenticated()"
+                 th:if="${currentUser != null and canReplyToReviews and userHasChildReply[reply.id] == true}">
+                <i class="fas fa-info-circle"></i>
+                <span>Vous avez déjà répondu à cette réponse.</span>
+            </div>
+            <div class="reply-limit-info"
+                 sec:authorize="isAuthenticated()"
+                 th:if="${currentUser != null and !canReplyToReviews}">
+                <i class="fas fa-info-circle"></i>
+                <span>Seuls l'auteur de la recette ou un administrateur peuvent répondre.</span>
+            </div>
+
+            <div sec:authorize="isAuthenticated()"
+                 th:id="${'edit-reply-' + reply.id}"
+                 class="box is-light is-hidden"
+                 style="margin-top: 1rem;">
+                <h4 class="title is-6">Modifier votre réponse</h4>
+                <form th:action="@{/recipes/reviews/replies/{id}/edit(id=${reply.id})}"
+                      method="post">
+                    <div class="field">
+                        <div class="control">
+                            <textarea class="textarea" name="comment" rows="3" th:text="${reply.comment}"></textarea>
+                        </div>
+                    </div>
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button type="submit" class="button is-success is-small">
+                                <i class="fas fa-save"></i>
+                                <span>Enregistrer</span>
+                            </button>
+                        </div>
+                        <div class="control">
+                            <button type="button" class="button is-light is-small"
+                                    th:attr="data-reply-id=${reply.id}"
+                                    onclick="toggleReplyEditForm(this.getAttribute('data-reply-id'))">
+                                Annuler
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div sec:authorize="isAuthenticated()"
+                 th:id="${'nested-reply-' + reply.id}"
+                 class="box is-light is-hidden"
+                 style="margin-top: 1rem;"
+                 th:if="${currentUser != null && canReplyToReviews and userHasChildReply[reply.id] != true}">
+                <h4 class="title is-6">Répondre à cette réponse</h4>
+                <div class="reply-context">
+                    <div class="reference-label">
+                        <i class="fas fa-reply"></i>
+                        <span th:text="${'Répondre à ' + reply.userName}">Répondre à Auteur</span>
+                    </div>
+                    <p class="reference-preview"
+                       th:text="${#strings.isEmpty(reply.comment) ? 'Pas de contenu texte' : #strings.abbreviate(reply.comment, 160)}">
+                        Texte de la réponse sélectionnée
+                    </p>
+                </div>
+                <form th:action="@{/recipes/reviews/{id}/reply(id=${reply.review.id})}"
+                      method="post">
+                    <input type="hidden" name="parentReplyId" th:value="${reply.id}">
+                    <div class="field">
+                        <div class="control">
+                            <textarea class="textarea" name="comment" rows="3" placeholder="Votre réponse..."></textarea>
+                        </div>
+                    </div>
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <button type="submit" class="button is-primary is-small">
+                                <i class="fas fa-paper-plane"></i>
+                                <span>Publier la réponse</span>
+                            </button>
+                        </div>
+                        <div class="control">
+                            <button type="button" class="button is-light is-small"
+                                    th:attr="data-reply-id=${reply.id}"
+                                    onclick="toggleNestedReplyForm(this.getAttribute('data-reply-id'))">
+                                Annuler
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </article>
+
+    <div class="reply-children" th:if="${!#lists.isEmpty(reply.children)}" style="margin-left: 2rem;">
+        <div th:each="child : ${reply.children}">
+            <div th:replace="~{fragments/review-reply :: replyThread(reply=${child}, currentUser=${currentUser}, isAdminUser=${isAdminUser}, reviewOwner=${reviewOwner}, canReplyToReviews=${canReplyToReviews}, reviewId=${reviewId}, reviewUserName=${reviewUserName}, reviewComment=${reviewComment})}"></div>
+        </div>
+    </div>
+</div>
+

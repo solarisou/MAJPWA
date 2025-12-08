@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Recettes - ECO Cook</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/recipes.css}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- HERO HEADER -->
+    <section class="recipes-hero">
+        <div class="container">
+            <div class="hero-content-recipes">
+                <div class="hero-badge-recipes">
+                    <i class="fas fa-utensils"></i>
+                    Découvrez nos recettes
+                </div>
+                <h1 class="hero-title-recipes">Suggestions de Recettes</h1>
+                <p class="hero-subtitle-recipes">
+                    Découvrez ce que vous pouvez cuisiner avec votre stock actuel et réduisez le gaspillage alimentaire
+                </p>
+                <div class="hero-actions" sec:authorize="isAuthenticated()">
+                    <a th:href="@{/recipes/new}" class="btn-create-recipe">
+                        <i class="fas fa-plus"></i>
+                        <span>Créer une recette</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- MESSAGES -->
+    <section class="section" th:if="${success} or ${error}">
+        <div class="container">
+            <div class="message-alert success" th:if="${success}">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${success}"></span>
+                <button class="message-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="message-alert error" th:if="${error}">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}"></span>
+                <button class="message-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- RECETTES 100% DISPONIBLES -->
+    <section class="section recipes-section" th:if="${!#lists.isEmpty(fullyAvailable)}">
+        <div class="container">
+            <div class="section-header-custom success">
+                <div class="section-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="section-info">
+                    <h2 class="section-title-custom">
+                        Recettes réalisables maintenant
+                        <span class="count-badge success" th:text="${#lists.size(fullyAvailable)}">0</span>
+                    </h2>
+                    <p class="section-description-custom">Vous avez tous les ingrédients nécessaires !</p>
+                </div>
+            </div>
+            
+            <div class="recipes-grid">
+                <div th:each="match : ${fullyAvailable}" class="recipe-card-modern">
+                    <div class="recipe-header">
+                        <div class="recipe-info">
+                            <h3 class="recipe-title" th:text="${match.recipe.name}">Nom de la recette</h3>
+                            <p class="recipe-description" th:text="${match.recipe.description}">Description</p>
+                        </div>
+                        <div class="recipe-badge">
+                            <span class="availability-pill success">
+                                <i class="fas fa-check"></i>
+                                100% disponible
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="recipe-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span th:text="${match.recipe.totalTime} + ' min'">30 min</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-users"></i>
+                            <span th:text="${match.recipe.servings} + ' pers.'">4 pers.</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span th:text="${match.recipe.difficulty}">Facile</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-utensils"></i>
+                            <span th:text="${match.recipe.category}">Plat</span>
+                        </div>
+                    </div>
+                    
+                    <div class="recipe-ingredients-preview">
+                        <strong class="ingredients-title">
+                            <i class="fas fa-check-circle"></i>
+                            Ingrédients disponibles
+                        </strong>
+                        <div class="ingredients-tags">
+                            <span th:each="ingredient : ${match.matchedIngredients}" class="ingredient-tag available">
+                                <i class="fas fa-check"></i>
+                                <span th:text="${ingredient.name}">Ingrédient</span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="recipe-actions">
+                        <a th:href="@{/recipes/{id}(id=${match.recipe.id})}" class="btn-recipe-view">
+                            <i class="fas fa-eye"></i>
+                            <span>Voir la recette</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- RECETTES PARTIELLEMENT DISPONIBLES -->
+    <section class="section recipes-section" th:if="${!#lists.isEmpty(partiallyAvailable)}">
+        <div class="container">
+            <div class="section-header-custom warning">
+                <div class="section-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="section-info">
+                    <h2 class="section-title-custom">
+                        Recettes partiellement réalisables
+                        <span class="count-badge warning" th:text="${#lists.size(partiallyAvailable)}">0</span>
+                    </h2>
+                    <p class="section-description-custom">Il vous manque quelques ingrédients</p>
+                </div>
+            </div>
+            
+            <div class="recipes-grid">
+                <div th:each="match : ${partiallyAvailable}" class="recipe-card-modern">
+                    <div class="recipe-header">
+                        <div class="recipe-info">
+                            <h3 class="recipe-title" th:text="${match.recipe.name}">Nom de la recette</h3>
+                            <p class="recipe-description" th:text="${match.recipe.description}">Description</p>
+                        </div>
+                        <div class="recipe-badge">
+                            <span class="availability-pill warning">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <span th:text="${#numbers.formatDecimal(match.matchPercentage, 0, 0)}">75</span>% disponible
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="recipe-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-clock"></i>
+                            <span th:text="${match.recipe.totalTime} + ' min'">30 min</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-users"></i>
+                            <span th:text="${match.recipe.servings} + ' pers.'">4 pers.</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span th:text="${match.recipe.difficulty}">Facile</span>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-utensils"></i>
+                            <span th:text="${match.recipe.category}">Plat</span>
+                        </div>
+                    </div>
+                    
+                    <div class="ingredients-comparison">
+                        <div class="ingredients-section has">
+                            <strong class="ingredients-title success">
+                                <i class="fas fa-check"></i>
+                                Vous avez
+                            </strong>
+                            <div class="ingredients-tags">
+                                <span th:each="ingredient : ${match.matchedIngredients}" class="ingredient-tag available">
+                                    <span th:text="${ingredient.name}">Ingrédient</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="ingredients-section missing">
+                            <strong class="ingredients-title danger">
+                                <i class="fas fa-times"></i>
+                                Il manque
+                            </strong>
+                            <div class="ingredients-tags">
+                                <span th:each="ingredient : ${match.missingIngredients}" class="ingredient-tag missing">
+                                    <span th:text="${ingredient.name}">Ingrédient</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="recipe-actions">
+                        <a th:href="@{/recipes/{id}(id=${match.recipe.id})}" class="btn-recipe-view secondary">
+                            <i class="fas fa-eye"></i>
+                            <span>Voir la recette</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- RECETTES NON DISPONIBLES  -->
+    <section class="section recipes-section" th:if="${!#lists.isEmpty(notAvailable)}">
+        <div class="container">
+            <div class="section-header-custom danger" sec:authorize="isAuthenticated()">
+                <div class="section-icon">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="section-info"  >
+                    <h2 class="section-title-custom" >
+                        Autres recettes
+                        <span class="count-badge danger" th:text="${#lists.size(notAvailable)}">0</span>
+                    </h2>
+                    <p class="section-description-custom">Faites vos courses pour réaliser ces recettes</p>
+                </div>
+            </div>
+            
+            <div class="recipes-grid-compact">
+                <div class="recipe-card-compact" th:each="match : ${notAvailable}">
+                    <div class="compact-header">
+                        <h4 class="compact-title" th:text="${match.recipe.name}">Recette</h4>
+                        <span class="availability-pill-small danger">
+                            <span th:text="${#numbers.formatDecimal(match.matchPercentage, 0, 0)}">25</span>%
+                        </span>
+                    </div>
+                    <div class="compact-meta">
+                        <span th:text="${match.recipe.category}">Catégorie</span>
+                        <span>•</span>
+                        <span th:text="${match.recipe.totalTime} + ' min'">30 min</span>
+                    </div>
+                    <a th:href="@{/recipes/{id}(id=${match.recipe.id})}" class="compact-link">
+                        Voir la recette
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- EMPTY STATE -->
+    <section class="section" th:if="${#lists.isEmpty(allRecipes)}">
+        <div class="container">
+            <div class="empty-state-modern">
+                <div class="empty-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h2 class="empty-title">Aucune recette pour le moment</h2>
+                <p class="empty-subtitle">Créez votre première recette pour commencer votre aventure culinaire anti-gaspi !</p>
+                <a th:href="@{/recipes/new}" class="btn-empty-action" sec:authorize="isAuthenticated()">
+                    <i class="fas fa-plus"></i>
+                    <span>Créer ma première recette</span>
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>  
+</body>
+</html>

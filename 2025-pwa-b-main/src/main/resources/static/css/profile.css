@@ -1,0 +1,432 @@
+.section {
+    padding: 2.5rem 1.5rem;
+    background: #fafafa;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, var(--eco-green) 0%, #7da83f 100%);
+    padding: 3rem 2rem;
+    text-align: center;
+    border-radius: 20px;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 8px 24px rgba(107, 148, 64, 0.25);
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: var(--eco-green);
+    margin-bottom: 1.25rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.profile-name {
+    color: white;
+    font-size: 2rem;
+    font-weight: 800;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.profile-email {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    border: 2px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+.stat-card.orange::before {
+    background: linear-gradient(90deg, var(--eco-orange), #d88a4d);
+}
+
+.stat-card.green::before {
+    background: linear-gradient(90deg, var(--eco-green), #7da83f);
+}
+
+.stat-card.blue::before {
+    background: linear-gradient(90deg, #6DBE9E, #5aad8c);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    opacity: 0.15;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card.orange .stat-icon {
+    color: var(--eco-orange);
+}
+
+.stat-card.green .stat-icon {
+    color: var(--eco-green);
+}
+
+.stat-card.blue .stat-icon {
+    color: #6DBE9E;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0.75rem 0;
+    line-height: 1;
+}
+
+.stat-card.orange .stat-number {
+    color: var(--eco-orange);
+}
+
+.stat-card.green .stat-number {
+    color: var(--eco-green);
+}
+
+.stat-card.blue .stat-number {
+    color: #6DBE9E;
+}
+
+.stat-label {
+    color: var(--light-text);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.info-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    border: 2px solid var(--border-color);
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.info-section:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.info-section .title.is-4 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--dark-text);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.info-section .title.is-4 .icon {
+    color: var(--eco-orange);
+}
+
+.info-section .title.is-4 .has-text-primary {
+    color: var(--eco-green) !important;
+}
+
+.info-section .title.is-4 .has-text-success {
+    color: var(--eco-green) !important;
+}
+
+.info-section .title.is-4 .has-text-warning {
+    color: var(--eco-orange) !important;
+}
+
+.table {
+    background: transparent;
+}
+
+.table td,
+.table th {
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0.75rem;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
+
+.table strong {
+    color: var(--dark-text);
+    font-weight: 600;
+}
+
+.tag.is-success {
+    background: linear-gradient(135deg, var(--eco-green), #7da83f);
+    color: white;
+    border-radius: 50px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+}
+
+.notification.is-success.is-light {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    color: #16a34a;
+    border-left: 4px solid var(--eco-green);
+    border-radius: 12px;
+}
+
+.notification p.has-text-weight-bold {
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.notification .fas {
+    margin-right: 0.5rem;
+    color: var(--eco-green);
+}
+
+.field {
+    margin-bottom: 1.5rem;
+}
+
+.label {
+    font-weight: 600;
+    color: var(--dark-text);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.input {
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+}
+
+.has-icons-left .input {
+    padding-left: 2.75rem;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--eco-orange);
+    box-shadow: 0 0 0 3px rgba(209, 122, 70, 0.1);
+}
+
+.control.has-icons-left .icon {
+    color: var(--eco-orange);
+    pointer-events: none;
+}
+
+.help {
+    color: var(--light-text);
+    font-size: 0.85rem;
+    margin-top: 0.35rem;
+}
+
+.button {
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    padding: 0.75rem 1.5rem;
+}
+
+.button.is-warning {
+    background: linear-gradient(135deg, var(--eco-orange), #d88a4d);
+    color: white;
+    box-shadow: 0 4px 12px rgba(209, 122, 70, 0.25);
+}
+
+.button.is-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(209, 122, 70, 0.35);
+}
+
+.button.is-danger.is-light {
+    background: white;
+    color: #ef4444;
+    border: 2px solid #ef4444;
+}
+
+.button.is-danger.is-light:hover {
+    background: #ef4444;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.button.is-fullwidth {
+    width: 100%;
+    justify-content: center;
+}
+
+.columns {
+    margin-bottom: 0;
+}
+
+.column {
+    padding: 0.75rem;
+}
+
+.content {
+    color: var(--dark-text);
+}
+
+.content p {
+    margin-bottom: 0.75rem;
+}
+
+.mt-2 { margin-top: 0.5rem; }
+.mt-4 { margin-top: 1rem; }
+.mt-5 { margin-top: 1.5rem; }
+
+.has-text-centered {
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .section {
+        padding: 2rem 1rem;
+    }
+    
+    .profile-header {
+        padding: 2.5rem 1.5rem;
+    }
+    
+    .profile-name {
+        font-size: 1.6rem;
+    }
+    
+    .profile-email {
+        font-size: 1rem;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        font-size: 2.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+    }
+    
+    .info-section {
+        padding: 1.5rem;
+    }
+    
+    .column.is-half {
+        width: 100%;
+    }
+    
+    .column.is-offset-one-quarter {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-header {
+        padding: 2rem 1.25rem;
+    }
+    
+    .profile-name {
+        font-size: 1.4rem;
+    }
+    
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+    
+    .stat-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+    }
+    
+    .info-section {
+        padding: 1.25rem;
+    }
+    
+    .info-section .title.is-4 {
+        font-size: 1.2rem;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stat-card,
+.info-section {
+    animation: fadeIn 0.4s ease;
+}

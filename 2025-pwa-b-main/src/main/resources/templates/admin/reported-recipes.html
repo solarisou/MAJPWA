@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <th:block th:replace="~{fragments/head :: common-head}"></th:block>
+    <title>Recettes signalées - ECO Cook</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link rel="stylesheet" th:href="@{/css/recipes.css}">
+    <link rel="stylesheet" th:href="@{/css/compte-admin.css}">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+    
+    <!-- REPORTED RECIPES -->
+    <section class="section">
+        <div class="container">
+            <div class="level">
+                <div class="level-left">
+                    <h1 class="title is-2">Recettes signalées</h1>
+                </div>
+                <div class="level-right">
+                    <a th:href="@{/admin}" class="button">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Retour</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Messages -->
+            <div th:if="${success}" class="notification is-success is-light">
+                <button class="delete" onclick="this.parentElement.remove()"></button>
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="notification is-danger is-light">
+                <button class="delete" onclick="this.parentElement.remove()"></button>
+                <span th:text="${error}"></span>
+            </div>
+            
+            <!-- Reports List -->
+            <div th:if="${!#lists.isEmpty(reports)}" class="box" style="margin-top: 2rem;">
+                <div th:each="report : ${reports}" class="box" style="margin-bottom: 1rem;">
+                    <div class="level">
+                        <div class="level-left">
+                            <div>
+                                <p class="title is-5">
+                                    <a th:href="@{/recipes/{id}(id=${report.recipe.id})}" th:text="${report.recipe.name}">Recette</a>
+                                </p>
+                                <p class="subtitle is-6">
+                                    Signalé par <span th:text="${report.reportedBy}">Utilisateur</span> 
+                                    le <span th:text="${#temporals.format(report.createdAt, 'dd/MM/yyyy HH:mm')}">Date</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="content" style="margin-top: 1rem;">
+                        <div class="notification is-warning is-light">
+                            <p><strong>Raison du signalement :</strong></p>
+                            <p th:text="${report.reportReason ?: 'Aucune raison spécifiée'}">Raison</p>
+                        </div>
+                        
+                        <div class="box" style="background: var(--bg-light); margin-top: 1rem;">
+                            <h3 class="title is-6">Détails de la recette</h3>
+                            <p><strong>Description :</strong> <span th:text="${report.recipe.description}">Description</span></p>
+                            <p><strong>Catégorie :</strong> <span th:text="${report.recipe.category}">Catégorie</span></p>
+                            <p><strong>Difficulté :</strong> <span th:text="${report.recipe.difficulty}">Difficulté</span></p>
+                            <p><strong>Créée par :</strong> <span th:text="${report.recipe.createdBy ?: 'Inconnu'}">Créateur</span></p>
+                            <p>
+                                <a th:href="@{/recipes/{id}(id=${report.recipe.id})}" class="button is-small is-info" target="_blank">
+                                    <i class="fas fa-external-link-alt"></i>
+                                    <span>Voir la recette</span>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="buttons" style="margin-top: 1rem;">
+                        <form th:action="@{/admin/recipes/reports/{id}/delete-recipe(id=${report.id})}" 
+                              method="post" 
+                              style="display: inline;"
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette recette ? Cette action est irréversible.');">
+                            <button type="submit" class="button is-danger">
+                                <i class="fas fa-trash"></i>
+                                <span>Supprimer la recette</span>
+                            </button>
+                        </form>
+                        <form th:action="@{/admin/recipes/reports/{id}/dismiss(id=${report.id})}" 
+                              method="post" 
+                              style="display: inline;">
+                            <button type="submit" class="button is-success">
+                                <i class="fas fa-check"></i>
+                                <span>Rejeter le signalement</span>
+                            </button>
+                        </form>
+                        <a th:href="@{/admin/recipes/reports/{id}(id=${report.id})}" class="button">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Détails</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(reports)}" class="box has-text-centered" style="margin-top: 2rem;">
+                <p class="title is-4">Aucune recette signalée</p>
+                <p class="subtitle is-6">Toutes les recettes sont en ordre !</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- FOOTER -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <div th:replace="~{fragments/header :: navbar-scripts}"></div>
+</body>
+</html>
+

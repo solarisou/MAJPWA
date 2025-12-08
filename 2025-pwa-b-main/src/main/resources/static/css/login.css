@@ -1,0 +1,392 @@
+:root {
+    /* Couleurs principales */
+    --eco-green: #6b9440;      
+    --eco-orange: #d17a46;    
+    --dark-text: #2d3748;      
+    --light-text: #64748b;     
+    --border-color: #cbd5e1; 
+    
+    /* Couleurs de fond */
+    --bg-light: #f8fafc;       
+    --bg-white: #ffffff;
+    
+    /* Couleurs d'état */
+    --success-light: #d1f4e0;  
+    --success-dark: #2d7a4f;  
+    --warning-light: #fde8c8;  
+    --warning-dark: #c97a3a;  
+    --danger-light: #fdd8d8;   
+    --danger-dark: #c94545;    
+    
+    /* Ombres */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Police globale */
+* {
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: #fafafa;
+    position: relative;
+    min-height: 100vh;
+}
+
+/* --- Arrière-plan décoratif --- */
+body::before,
+body::after {
+    content: '';
+    position: fixed;
+    border-radius: 50%;
+    z-index: 0;
+    opacity: 0.08;
+}
+
+body::before {
+    width: 600px;
+    height: 600px;
+    background: var(--eco-green);
+    top: -300px;
+    right: -200px;
+    filter: blur(80px);
+}
+
+body::after {
+    width: 500px;
+    height: 500px;
+    background: var(--eco-orange);
+    bottom: -250px;
+    left: -150px;
+    filter: blur(100px);
+}
+
+.hero {
+    position: relative;
+    z-index: 1;
+}
+
+/* --- Carte principale --- */
+.box {
+    background: white;
+    border-radius: 24px;
+    padding: 1rem 2.5rem 3rem 2.5rem;
+    box-shadow: 
+        0 0 0 1px rgba(0,0,0,0.02),
+        0 2px 4px rgba(0,0,0,0.02),
+        0 12px 24px rgba(0,0,0,0.05),
+        0 24px 48px rgba(0,0,0,0.05);
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.8);
+    transition: transform 0.3s ease;
+}
+
+/* Bordure colorée au survol */
+.box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    padding: 2px;
+    background: linear-gradient(135deg, var(--eco-green), var(--eco-orange));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.box:hover::before {
+    opacity: 0.3;
+}
+
+/* --- En-tête / logo --- */
+.logo-section {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.logo-container {
+    display: inline-block;
+    border-radius: 20px;
+    background: transparent; 
+    position: relative;
+    width: 200px;
+    margin-bottom: 0.5rem;
+}
+
+.logo-container img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.title-main {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--dark-text);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.subtitle-text {
+    color: var(--light-text);
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+}
+
+/* --- Messages d’état (succès / erreur) --- */
+.notification {
+    border-radius: 14px;
+    border: none;
+    padding: 1rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.notification i {
+    font-size: 1.1rem;
+}
+
+.notification.is-danger {
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    color: #dc2626;
+    border-left: 4px solid #dc2626;
+}
+
+.notification.is-success {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    color: #16a34a;
+    border-left: 4px solid #16a34a;
+}
+
+/* --- Champs de formulaire --- */
+.field {
+    margin-bottom: 1.5rem;
+}
+
+.label {
+    color: #374151;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.label i {
+    color: var(--eco-orange);
+    font-size: 0.9rem;
+}
+
+.control {
+    position: relative;
+}
+
+.input {
+    border: 2px solid var(--border-color);
+    border-radius: 14px;
+    padding: 0.85rem 1.2rem;
+    font-size: 0.95rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #fafafa;
+    color: var(--dark-text);
+    width: 100%;
+}
+
+.input:focus {
+    border-color: var(--eco-orange);
+    background: white;
+    box-shadow: 
+        0 0 0 4px rgba(209, 122, 70, 0.08),
+        0 4px 12px rgba(209, 122, 70, 0.12);
+    transform: translateY(-1px);
+}
+
+.input::placeholder {
+    color: #9ca3af;
+}
+
+/* Bouton pour afficher/masquer le mot de passe */
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+    z-index: 10;
+}
+
+.password-toggle:hover {
+    color: var(--eco-orange);
+    background: rgba(209, 122, 70, 0.05);
+}
+
+.password-toggle i {
+    font-size: 1rem;
+}
+
+/* --- Bouton principal --- */
+.button.is-primary {
+    background: linear-gradient(135deg, var(--eco-green) 0%, var(--eco-orange) 100%);
+    border: none;
+    border-radius: 14px;
+    padding: 0.9rem 2rem;
+    font-weight: 700;
+    font-size: 1rem;
+    color: white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 4px 12px rgba(209, 122, 70, 0.25),
+        0 2px 4px rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Petit effet lumineux au survol */
+.button.is-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
+
+.button.is-primary:hover::before {
+    left: 100%;
+}
+
+.button.is-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 8px 20px rgba(209, 122, 70, 0.35),
+        0 4px 8px rgba(0,0,0,0.08);
+}
+
+.button.is-primary:active {
+    transform: translateY(0);
+}
+
+/* --- Séparateur  --- */
+.divider-container {
+    display: flex;
+    align-items: center;
+    margin: 2rem 0;
+    gap: 1rem;
+}
+
+.divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border-color) 20%, var(--border-color) 80%, transparent);
+}
+
+.divider-text {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0 0.5rem;
+}
+
+/* --- Pied de page (liens) --- */
+.footer-links {
+    text-align: center;
+}
+
+.footer-links p {
+    color: var(--light-text);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.footer-links a {
+    color: var(--eco-orange);
+    font-weight: 600;
+    text-decoration: none;
+    position: relative;
+    transition: color 0.2s;
+    display: inline-block;
+}
+
+.footer-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--eco-green), var(--eco-orange));
+    transition: all 0.3s;
+    transform: translateX(-50%);
+}
+
+.footer-links a:hover {
+    color: var(--eco-green);
+}
+
+.footer-links a:hover::after {
+    width: 100%;
+}
+
+/* Lien de retour */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #9ca3af;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.2s;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    margin-top: 0.5rem;
+}
+
+.back-link i {
+    transition: transform 0.2s;
+}
+
+.back-link:hover {
+    color: var(--eco-orange);
+    background: rgba(209, 122, 70, 0.05);
+}
+
+.back-link:hover i {
+    transform: translateX(-3px);
+}
+
+/* --- Responsive (tablettes et mobiles) --- */
+@media (max-width: 768px) {
+    .box {
+        padding: 1.5rem 1.5rem 2rem 1.5rem;
+    }
+    
+    .title-main {
+        font-size: 1.75rem;
+    }
+    
+    body::before,
+    body::after {
+        display: none;
+    }
+}
