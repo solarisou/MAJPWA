@@ -1,30 +1,38 @@
 package com.ecocook.controller;
 
-import com.ecocook.model.Ingredient;
-import com.ecocook.model.Recipe;
-import com.ecocook.model.RecipeModification;
-import com.ecocook.model.RecipeModification.ModificationStatus;
-import com.ecocook.model.IngredientModification;
-import com.ecocook.model.RecipeReview;
-import com.ecocook.model.RecipeReport;
-import com.ecocook.repository.RecipeModificationRepository;
-import com.ecocook.repository.RecipeReviewRepository;
-import com.ecocook.repository.RecipeReportRepository;
-import com.ecocook.service.RecipeSelectionService;
-import com.ecocook.service.RecipeService;
-import com.ecocook.service.RecipeService.RecipeMatch;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import com.ecocook.model.Ingredient;
+import com.ecocook.model.IngredientModification;
+import com.ecocook.model.Recipe;
+import com.ecocook.model.RecipeModification;
+import com.ecocook.model.RecipeModification.ModificationStatus;
+import com.ecocook.model.RecipeReport;
+import com.ecocook.model.RecipeReview;
+import com.ecocook.repository.RecipeModificationRepository;
+import com.ecocook.repository.RecipeReportRepository;
+import com.ecocook.repository.RecipeReviewRepository;
+import com.ecocook.service.RecipeSelectionService;
+import com.ecocook.service.RecipeService;
+import com.ecocook.service.RecipeService.RecipeMatch;
 
 /**
  * Gestion des recettes
@@ -424,5 +432,45 @@ public class RecipeController {
         
         redirectAttributes.addFlashAttribute("success", "Recette signalée avec succès. Un administrateur va examiner votre signalement.");
         return "redirect:/recipes/" + id;
+    }
+
+    /**
+     * API REST pour récupérer toutes les recettes avec correspondances
+     * Utilisé par la page recipes.html en JavaScript
+     */
+    @GetMapping("/api/all")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getRecipesApi(Authentication authentication) {
+        String userName = authentication != null ? authentication.getName() : null;
+        
+        // Pour un invité : on renvoie toutes les recettes (score à zéro).
+        // Pour un utilisateur : on calcule la correspondance avec son garde-manger.
+        List<RecipeMatch> matches = userName != null 
+            ? recipeService.findMatchingRecipes(userName) 
+            : recipeService.getAllRecipes().stream()
+                .map(r -> new RecipeMatch(r, 0, List.of(), r.getIngredients()))
+                .toList();
+        
+        // Répartition simple pour l'affichage par sections dans la vue.
+        List<RecipeMatch> fullyAvailable = matches.stream()
+            .filter(RecipeMatch::isFullyAvailable)
+            .toList();
+        
+        List<RecipeMatch> partiallyAvailable = matches.stream()
+            .filter(RecipeMatch::isPartiallyAvailable)
+            .toList();
+        
+        List<RecipeMatch> notAvailable = matches.stream()
+            .filter(m -> !m.isFullyAvailable() && !m.isPartiallyAvailable())
+            .toList();
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("fullyAvailable", fullyAvailable);
+        response.put("partiallyAvailable", partiallyAvailable);
+        response.put("notAvailable", notAvailable);
+        response.put("totalRecipes", matches.size());
+        response.put("isAuthenticated", authentication != null);
+        
+        return ResponseEntity.ok(response);
     }
 }

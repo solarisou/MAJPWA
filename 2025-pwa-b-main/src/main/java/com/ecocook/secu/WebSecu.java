@@ -65,6 +65,8 @@ public class WebSecu {
             )
             .csrf(csrf -> csrf
                 .ignoringRequestMatchers(PathRequest.toH2Console())
+                .ignoringRequestMatchers("/pantry/api/**")
+                .ignoringRequestMatchers("/api/vue/**")
             )
             .headers(headers -> headers
                 .frameOptions(frameOptions -> frameOptions.sameOrigin())
