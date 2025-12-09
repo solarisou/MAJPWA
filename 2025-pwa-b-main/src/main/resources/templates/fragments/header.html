@@ -123,6 +123,21 @@
      <!-- Script burger menu -->
     <th:block th:fragment="navbar-scripts">
         <script th:src="@{/js/menu.js}"></script>
+        <script th:src="@{/js/pwa-install.js}"></script>
+        <!-- Enregistrement du Service Worker pour PWA -->
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/service-worker.js')
+                        .then(function(registration) {
+                            console.log('Service Worker enregistre:', registration.scope);
+                        })
+                        .catch(function(error) {
+                            console.log('Erreur Service Worker:', error);
+                        });
+                });
+            }
+        </script>
     </th:block>
 </body>
 </html>

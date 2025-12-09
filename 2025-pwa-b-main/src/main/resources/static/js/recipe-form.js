@@ -26,8 +26,13 @@ function addIngredient() {
             </div>
             <div class="ingredient-input-small">
                 <label class="form-label-small">Unité</label>
-                <input class="form-input ingredient-unit-input" type="text" name="ingredientUnits"
-                       placeholder="g, kg...">
+                <select class="form-input ingredient-unit-input" name="ingredientUnits">
+                    <option value="">-</option>
+                    <option value="g">g</option>
+                    <option value="kg">kg</option>
+                    <option value="L">L</option>
+                    <option value="unité">unité</option>
+                </select>
             </div>
             <button type="button" class="btn-remove-ingredient remove-ingredient">
                 <i class="fas fa-trash"></i>
